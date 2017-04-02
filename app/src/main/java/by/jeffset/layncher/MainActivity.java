@@ -31,14 +31,15 @@ public class MainActivity extends AppCompatActivity implements AppLauncherAdapte
    public static final String EXTRA_THEME = "by.jeffset.layncher.theme";
 
    public void onMenuDeleteClick(MenuItem item) {
+      data.pendingRecentApps.remove(contextApp);
       data.recentApps.remove(contextApp);
       data.newApps.remove(contextApp);
       launcherAdapter.removeItem(contextApp);
+      publishRecentAppsList();
+      publishNewAppsList();
    }
 
    public void onMenuInfoClick(MenuItem item) {
-      boolean isPopular = data.recentApps.contains(contextApp);
-      boolean isNew = data.newApps.contains(contextApp);
       new AlertDialog.Builder(this)
           .setTitle(R.string.app_info_header)
           .setMessage(contextApp.label)
@@ -55,6 +56,7 @@ public class MainActivity extends AppCompatActivity implements AppLauncherAdapte
 
       private Deque<App> newApps = new LinkedList<>();
       private Deque<App> recentApps = new LinkedList<>();
+      private Deque<App> pendingRecentApps = new LinkedList<>();
    }
 
    @Override public void onCreateContextMenu(ContextMenu menu, View v,
@@ -75,11 +77,14 @@ public class MainActivity extends AppCompatActivity implements AppLauncherAdapte
 
    private int columnCount;
 
+   private boolean wasJustPaused = false;
+
    @Override
    protected void onCreate(Bundle savedInstanceState) {
       setTheme(getIntent().getIntExtra(EXTRA_THEME, R.style.AppTheme_Light));
       super.onCreate(savedInstanceState);
       setContentView(R.layout.activity_main);
+      wasJustPaused = false;
 
       FragmentManager fm = getSupportFragmentManager();
       data = (DataFragment) fm.findFragmentByTag(DataFragment.FRAGMENT_TAG);
@@ -125,8 +130,21 @@ public class MainActivity extends AppCompatActivity implements AppLauncherAdapte
 
    @Override protected void onResume() {
       super.onResume();
+      if (wasJustPaused) {
+         for (App app : data.pendingRecentApps) {
+            if (data.recentApps.contains(app))
+               data.recentApps.remove(app);
+            data.recentApps.addFirst(app);
+         }
+         data.pendingRecentApps.clear();
+      }
       publishRecentAppsList();
       publishNewAppsList();
+   }
+
+   @Override protected void onPause() {
+      super.onPause();
+      wasJustPaused = true;
    }
 
    private void publishNewAppsList() {
@@ -173,9 +191,10 @@ public class MainActivity extends AppCompatActivity implements AppLauncherAdapte
    }
 
    private void addPendingRecentList(App app) {
-      if (data.recentApps.contains(app))
+      data.pendingRecentApps.add(app);
+      /*if (data.recentApps.contains(app))
          data.recentApps.remove(app);
-      data.recentApps.addFirst(app);
+      data.recentApps.addFirst(app);*/
    }
 
    @Override

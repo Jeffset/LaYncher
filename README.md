@@ -1,5 +1,5 @@
 # LaYncher
-![Ddss](/app/src/main/res/drawable/icon.png)
+![Logo](/app/src/main/res/drawable/icon.png)
 
 или ПускЯтель:)
 ### Иконки
