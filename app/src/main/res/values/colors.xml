@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+   <color name="colorPrimary">#8BC34A</color>
+   <color name="colorPrimaryLight">#dcedc8</color>
+   <color name="colorPrimaryMedium">#9CCC65</color>
+   <color name="colorPrimaryDark">#33691E</color>
+   <color name="colorAccent">#64dd17</color>
+   <!-- Light -->
+   <color name="colorNewAppStrip.Light">#4caf50</color>
+   <color name="colorIndicatorSelected.Light">@color/colorPrimaryDark</color>
+   <color name="colorIndicatorInactive.Light">@color/colorPrimaryDark</color>
+   <color name="colorRecentAppStrip.Light">#c0ca33</color>
+   <!-- Dark -->
+   <color name="colorNewAppStrip.Dark">@color/colorPrimaryDark</color>
+   <color name="colorIndicatorSelected.Dark">@color/colorAccent</color>
+   <color name="colorIndicatorInactive.Dark">@color/colorPrimary</color>
+   <color name="colorRecentAppStrip.Dark">#1b5e20</color>
+   <color name="windowBackground.Dark">#000</color>
+</resources>

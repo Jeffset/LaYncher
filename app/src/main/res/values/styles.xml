@@ -1,0 +1,42 @@
+<resources>
+
+   <declare-styleable name="Theme">
+      <attr name="colorNewAppsStrip" format="color"/>
+      <attr name="colorRecentAppsStrip" format="color"/>
+      <attr name="colorIndicatorSelected" format="color"/>
+      <attr name="colorIndicatorInactive" format="color"/>
+   </declare-styleable>
+
+   <!-- Base application theme. -->
+   <style name="SplashTheme" parent="Theme.AppCompat.Light.NoActionBar">
+      <item name="android:windowBackground">@drawable/splash</item>
+      <item name="colorPrimary">@color/colorPrimary</item>
+      <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+      <item name="colorAccent">@color/colorAccent</item>
+   </style>
+
+
+   <style name="AppTheme.Light" parent="Theme.AppCompat.Light.NoActionBar">
+      <item name="colorPrimary">@color/colorPrimary</item>
+      <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+      <item name="colorAccent">@color/colorAccent</item>
+      <item name="android:windowBackground">@color/colorPrimaryMedium</item>
+      <item name="colorNewAppsStrip">@color/colorNewAppStrip.Light</item>
+      <item name="colorRecentAppsStrip">@color/colorRecentAppStrip.Light</item>
+      <item name="colorIndicatorSelected">@color/colorIndicatorSelected.Light</item>
+      <item name="colorIndicatorInactive">@color/colorIndicatorInactive.Light</item>
+   </style>
+
+   <style name="AppTheme.Dark" parent="Theme.AppCompat.NoActionBar">
+      <item name="android:windowBackground">@color/windowBackground.Dark</item>
+      <item name="android:textColor">@color/colorPrimary</item>
+      <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+      <item name="colorAccent">@color/colorAccent</item>
+      <item name="colorNewAppsStrip">@color/colorNewAppStrip.Dark</item>
+      <item name="colorRecentAppsStrip">@color/colorRecentAppStrip.Dark</item>
+      <item name="colorIndicatorSelected">@color/colorIndicatorSelected.Dark</item>
+      <item name="colorIndicatorInactive">@color/colorIndicatorInactive.Dark</item>
+   </style>
+
+
+</resources>

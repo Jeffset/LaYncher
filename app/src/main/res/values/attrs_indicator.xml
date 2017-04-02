@@ -1,0 +1,9 @@
+<resources>
+   <declare-styleable name="PagerIndicator">
+      <attr name="colorInactiveStroke" format="color"/>
+      <attr name="colorSelectedFill" format="color"/>
+      <attr name="viewCount" format="integer"/>
+      <attr name="activeView" format="float"/>
+      <attr name="inactiveStrokeWidth" format="integer"/>
+   </declare-styleable>
+</resources>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+   <string name="app_name">LaYncher</string>
+   <string name="rb_large_layout">Large layout</string>
+   <string name="layncher_settings_caption">LaYncher settings</string>
+   <string name="rb_standard_layout">Standard layout</string>
+   <string name="welcome_to_layncher">Welcome to LaYncher!\nY - Yandex</string>
+   <string name="tip_layout_standard">Portrait: 4 icons in a row\nLandscape: 6 icons in a row</string>
+   <string name="theme_caption">Theme</string>
+   <string name="layout_style_caption">Layout style</string>
+   <string name="button_next_page">next</string>
+   <string name="popular_apps">POPULAR APPS</string>
+   <string name="rb_dark_text">Dark</string>
+   <string name="launched_msg">%s app launched</string>
+   <string name="rb_light_text">Light</string>
+   <string name="info_text_1">Here we have REALLY INFINITE scrolling, nevertheless you can delete any element you (don\'t) like, special cactus theme and more!</string>
+   <string name="info_text_2">For implementation of \"popular\" and \"new\" groups of apps I used Coordinator Layout, hope you won\'t blame me for that:)</string>
+   <string name="tip_layout_large">Portrait: 5 icons in a row\nLandscape: 7 icons in a row</string>
+   <string name="greetings_start">start</string>
+   <string name="new_installed_apps">NEW INSTALLED APPS</string>
+   <string name="menu_delete">Delete</string>
+   <string name="menu_info">Info</string>
+   <string name="app_info_header">application info:</string>
+</resources>

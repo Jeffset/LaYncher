@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+   <dimen name="card_elevation">2dp</dimen>
+   <dimen name="iconSize">72dp</dimen>
+   <dimen name="iconCornerRadius">6dp</dimen>
+   <dimen name="iconFrameThickness">3dp</dimen>
+</resources>

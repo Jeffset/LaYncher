@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+   <string name="app_name">ПускЯтель</string>
+   <string name="welcome_to_layncher">Добро пожаловать в ПускЯтель!\nЯ - Яндекс</string>
+   <string name="button_next_page">далее</string>
+   <string name="info_text_1">Тут РЕАЛЬНО БЕСКОНЕЧНЫЙ скролл, Вы тем не менее можете удалять любые элементы, cпециальная кактусовая тема, и не только!</string>
+   <string name="info_text_2">При реализации \"новых\" и \"популярных\" приложений я использовал Coordinator Layout, надеюсь, вы не накажете за это:)</string>
+   <string name="greetings_start">старт</string>
+   <string name="tip_layout_standard">Портетная: 4 иконки в ряд\nЛандшафтная: 6 иконок в ряд</string>
+   <string name="tip_layout_large">Портетная: 5 иконок в ряд\nЛандшафтная: 7 иконок в ряд</string>
+   <string name="layncher_settings_caption">Настройки ПускЯтеля</string>
+   <string name="rb_dark_text">Темное</string>
+   <string name="rb_light_text">Светлое</string>
+   <string name="theme_caption">Оформление</string>
+   <string name="layout_style_caption">Настройки иконок</string>
+   <string name="rb_standard_layout">Стандартный макет</string>
+   <string name="rb_large_layout">Плотный макет</string>
+   <string name="new_installed_apps">НОВЫЕ ПРИЛОЖЕНИЯ</string>
+   <string name="popular_apps">ПОПУЛЯРНЫЕ ПРИЛОЖЕНИЯ</string>
+   <string name="launched_msg">Приложение %s запущено</string>
+   <string name="menu_delete">Удалить</string>
+   <string name="menu_info">Подробнее</string>
+   <string name="app_info_header">информация:</string>
+</resources>
