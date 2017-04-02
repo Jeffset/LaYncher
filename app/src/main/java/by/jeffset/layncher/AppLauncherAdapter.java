@@ -11,8 +11,10 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.Bundle;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
+import android.support.annotation.Nullable;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -42,6 +44,7 @@ class App {
  */
 
 public class AppLauncherAdapter extends RecyclerView.Adapter<AppLauncherAdapter.AppViewHolder> {
+   private static final String DELETED_KEY = "by.jeffset.layncher.adapter.deleted";
    static final int APP_TAG_KEY = R.id.recyclerView;
 
    interface AppActionListener {
@@ -54,8 +57,9 @@ public class AppLauncherAdapter extends RecyclerView.Adapter<AppLauncherAdapter.
 
    private Activity activity;
 
-   private Set<Integer> deleted = new TreeSet<>();
+   private TreeSet<Integer> deleted = new TreeSet<>();
    private Random random = new Random();
+
    private static int iconIds[] = {
        R.drawable.icon1, R.drawable.icon2,
        R.drawable.icon3, R.drawable.icon4,
@@ -122,6 +126,18 @@ public class AppLauncherAdapter extends RecyclerView.Adapter<AppLauncherAdapter.
       int n = random.nextInt(10);
       //int n = (int) (Math.round(Math.abs(Math.sin(1000 * position) * 10.f)) % 10);
       app.icon = icons[n];
+   }
+
+   void onSaveInstanceState(@Nullable Bundle outState) {
+      if (outState != null) {
+         outState.putSerializable(DELETED_KEY, deleted);
+      }
+   }
+
+   void onRestoreInstanceState(@Nullable Bundle savedState) {
+      if (savedState != null) {
+         deleted = (TreeSet<Integer>) savedState.getSerializable(DELETED_KEY);
+      }
    }
 
    private int getAppID(int position) {
