@@ -123,16 +123,6 @@ public class MainActivity extends AppCompatActivity implements AppLauncherAdapte
          }
    }
 
-   @Override protected void onSaveInstanceState(Bundle outState) {
-      super.onSaveInstanceState(outState);
-      launcherAdapter.onSaveInstanceState(outState);
-   }
-
-   @Override protected void onRestoreInstanceState(Bundle savedInstanceState) {
-      super.onRestoreInstanceState(savedInstanceState);
-      launcherAdapter.onRestoreInstanceState(savedInstanceState);
-   }
-
    @Override protected void onResume() {
       super.onResume();
       publishRecentAppsList();

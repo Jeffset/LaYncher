@@ -2,20 +2,17 @@ package by.jeffset.layncher;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
-import android.graphics.drawable.BitmapDrawable;
-import android.os.Bundle;
-import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
-import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.res.ResourcesCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,7 +41,13 @@ class App {
  */
 
 public class AppLauncherAdapter extends RecyclerView.Adapter<AppLauncherAdapter.AppViewHolder> {
-   private static final String DELETED_KEY = "by.jeffset.layncher.adapter.deleted";
+   public static class DataFragment extends Fragment {
+      public DataFragment() {}
+
+      Set<Integer> deleted_items = new TreeSet<>();
+   }
+
+   private static final String DATA_FRAGMENT_TAG = "by.jeffset.layncher.adapter.dataFragment";
    static final int APP_TAG_KEY = R.id.recyclerView;
 
    interface AppActionListener {
@@ -57,7 +60,7 @@ public class AppLauncherAdapter extends RecyclerView.Adapter<AppLauncherAdapter.
 
    private Activity activity;
 
-   private TreeSet<Integer> deleted = new TreeSet<>();
+   private Set<Integer> deleted = new TreeSet<>();
    private Random random = new Random();
 
    private static int iconIds[] = {
@@ -69,8 +72,15 @@ public class AppLauncherAdapter extends RecyclerView.Adapter<AppLauncherAdapter.
    };
    private static Bitmap[] icons = new Bitmap[10];
 
-   AppLauncherAdapter(Activity activity) {
+   AppLauncherAdapter(AppCompatActivity activity) {
       this.activity = activity;
+      FragmentManager fm = activity.getSupportFragmentManager();
+      DataFragment data = (DataFragment) fm.findFragmentByTag(DATA_FRAGMENT_TAG);
+      if (data == null) {
+         data = new DataFragment();
+         fm.beginTransaction().add(data, DATA_FRAGMENT_TAG).commit();
+      }
+      deleted = data.deleted_items;
       setHasStableIds(true);
    }
 
@@ -126,18 +136,6 @@ public class AppLauncherAdapter extends RecyclerView.Adapter<AppLauncherAdapter.
       int n = random.nextInt(10);
       //int n = (int) (Math.round(Math.abs(Math.sin(1000 * position) * 10.f)) % 10);
       app.icon = icons[n];
-   }
-
-   void onSaveInstanceState(@Nullable Bundle outState) {
-      if (outState != null) {
-         outState.putSerializable(DELETED_KEY, deleted);
-      }
-   }
-
-   void onRestoreInstanceState(@Nullable Bundle savedState) {
-      if (savedState != null) {
-         deleted = (TreeSet<Integer>) savedState.getSerializable(DELETED_KEY);
-      }
    }
 
    private int getAppID(int position) {
