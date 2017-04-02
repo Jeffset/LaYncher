@@ -4,8 +4,7 @@
       android:drawable="@color/colorPrimary"
       android:gravity="fill_horizontal|fill_vertical"
       />
-   <item>
-      <bitmap android:src="@drawable/icon"
-              android:gravity="center"/>
-   </item>
+   <item
+      android:drawable="@drawable/splash_icon"
+      android:gravity="center"/>
 </layer-list>
