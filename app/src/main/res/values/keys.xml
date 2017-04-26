@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+   <string name="standard_layout_value">1</string>
+   <string name="large_layout_value">2</string>
+   <!--===========================================-->
+   <string name="pref_theme_key">layncher.theme</string>
+   <string name="pref_layout_key">layncher.layout</string>
+   <string name="pref_show_faves_key">layncher.show_faves</string>
+   <string name="pref_history_len_key">layncher.history_len</string>
+</resources>

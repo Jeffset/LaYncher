@@ -41,15 +41,13 @@ public class AppLauncherAdapter
    public static class DataFragment extends Fragment {
       private static final String TAG = "by.jeffset.layncher.adapter.dataFragment";
 
-      public DataFragment() {
-
-      }
+      public DataFragment() {}
 
    }
 
    static final int APP_TAG_KEY = R.id.recyclerView;
 
-   private final List<Launchable> launchables = new ArrayList<>();
+   private List<Launchable> launchables = new ArrayList<>();
 
    public void add(@NonNull Launchable item) {
       launchables.add(item);

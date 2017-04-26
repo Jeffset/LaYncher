@@ -88,9 +88,9 @@ public class InstalledApp implements Launchable {
          }
       }*/
       File cached = new File(context.getCacheDir(), id + "icon");
-      /*if (cached.exists()) {
+      if (cached.exists()) {
          return new BitmapDrawable(BitmapFactory.decodeFile(cached.getPath()));
-      }*/
+      }
 
       Resources res = context.getResources();
 
@@ -151,9 +151,7 @@ public class InstalledApp implements Launchable {
       } catch (Resources.NotFoundException e) {
          e.printStackTrace();
       }
-      if (iconOriginal == null) {
-         iconOriginal = pm.getApplicationIcon(applicationInfo);
-      }
+      if (iconOriginal == null) iconOriginal = pm.getApplicationIcon(applicationInfo);
       icon = decorateIcon(iconOriginal, context, applicationInfo.packageName);
       label = pm.getApplicationLabel(applicationInfo);
    }

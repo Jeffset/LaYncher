@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -15,30 +16,26 @@ import android.util.Log;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 
-import by.jeffset.layncher.AppLauncherAdapter;
 import by.jeffset.layncher.MainActivity;
 import by.jeffset.layncher.R;
+import by.jeffset.layncher.settings.SettingsWrapper;
 
 public class WelcomeActivity extends AppCompatActivity {
 
    static final String EXTRA_STARTUP_PAGE_NUM = "by.jeffset.layncher.startup_page";
    public static final String ANIMATABLE_TAG = "by.jeffset.animatable";
    private static final String TAG = "JEFFSET-LAYNCHER";
+   public static final String PREFS_WELCOME_SHOWED = "by.jeffset.layncher.welcome_showed";
    private ViewPager viewPager;
    private int oldDragPosition = 0;
    private ValueAnimator pageFlipper;
    private PagerIndicator pagerPagerIndicator;
 
-   // static because fragment doesn't recreate itself during config changes,
-   // but this activity does.
-   public static int theme = R.style.AppTheme_Light;
-   public static int launcherMode = MainActivity.MODE_STANDARD;
-
    public void onMainActivityStart(View view) {
       finish();
+      SettingsWrapper settingsWrapper = new SettingsWrapper(this);
+      settingsWrapper.setWelcomeWasShowed();
       Intent intent = new Intent(this, MainActivity.class);
-      intent.putExtra(MainActivity.EXTRA_LAUNCHER_MODE, launcherMode);
-      intent.putExtra(MainActivity.EXTRA_THEME, theme);
       startActivity(intent);
    }
 
@@ -109,10 +106,18 @@ public class WelcomeActivity extends AppCompatActivity {
    }
 
    protected void onCreate(Bundle savedInstanceState) {
-      int page = getIntent().getIntExtra(EXTRA_STARTUP_PAGE_NUM, 0);
+      PreferenceManager.setDefaultValues(this, R.xml.settings_fave_apps, true);
+      SettingsWrapper settingsWrapper = new SettingsWrapper(this);
+      if (settingsWrapper.wasWelcomeShowed()) {
+         startActivity(new Intent(this, MainActivity.class));
+         super.onCreate(savedInstanceState);
+         finish();
+         return;
+      }
+
       //AppLauncherAdapter.loadIcons(this, R.color.colorPrimary);
-      theme = page == 0 ? R.style.AppTheme_Light : theme;
-      setTheme(theme);
+      //theme = (page == 0 ? R.style.AppTheme_Light : theme);
+      setTheme(settingsWrapper.getThemeId());
       super.onCreate(savedInstanceState);
       setContentView(R.layout.activity_welcome);
 
@@ -123,7 +128,8 @@ public class WelcomeActivity extends AppCompatActivity {
       viewPager.setAdapter(adapter);
       viewPager.setPageTransformer(false, new PageAnimator());
       viewPager.setOnTouchListener((v, event) -> true);
-      viewPager.setCurrentItem(page, false);
+      viewPager.setCurrentItem(getIntent().getIntExtra(EXTRA_STARTUP_PAGE_NUM, 0),
+          false);
    }
 
    @Override protected void onResume() {

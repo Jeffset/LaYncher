@@ -15,5 +15,5 @@
    <color name="colorIndicatorSelected.Dark">@color/colorAccent</color>
    <color name="colorIndicatorInactive.Dark">@color/colorPrimary</color>
    <color name="colorRecentAppStrip.Dark">#1b5e20</color>
-   <color name="windowBackground.Dark">#000</color>
+   <color name="windowBackground.Dark">#212121</color>
 </resources>

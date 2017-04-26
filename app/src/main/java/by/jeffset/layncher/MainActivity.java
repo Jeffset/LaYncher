@@ -1,28 +1,24 @@
 package by.jeffset.layncher;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -31,14 +27,10 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Random;
+
+import by.jeffset.layncher.settings.SettingsWrapper;
 
 public class MainActivity extends AppCompatActivity implements Launchable.AppListener {
-
-   public static final String EXTRA_LAUNCHER_MODE = "by.jeffset.layncher.launcher_mode";
-   public static final int MODE_STANDARD = 1;
-   public static final int MODE_LARGE = 2;
-   public static final String EXTRA_THEME = "by.jeffset.layncher.theme";
 
    public void onMenuDeleteClick(MenuItem item) {
       data.pendingRecentApps.remove(contextApp);
@@ -91,11 +83,13 @@ public class MainActivity extends AppCompatActivity implements Launchable.AppLis
    private boolean wasJustPaused = false;
 
    private void populateAdapterWithInstalledApps() {
+      // TODO implement background precomputing.
       Intent launchIntent = new Intent(Intent.ACTION_MAIN);
       launchIntent.addCategory(Intent.CATEGORY_LAUNCHER);
       PackageManager pm = getPackageManager();
       List<ResolveInfo> intentActivities = pm.queryIntentActivities(launchIntent, 0);
-      List<InstalledApp> apps = new ArrayList<>();
+      List<Launchable> apps = new ArrayList<>();
+      apps.add(new SettingsLauncher(this));
       for (ResolveInfo info : intentActivities) {
          ApplicationInfo applicationInfo = info.activityInfo.applicationInfo;
          InstalledApp app = new InstalledApp(applicationInfo, pm, this);
@@ -107,10 +101,16 @@ public class MainActivity extends AppCompatActivity implements Launchable.AppLis
 
    @Override
    protected void onCreate(Bundle savedInstanceState) {
-      setTheme(getIntent().getIntExtra(EXTRA_THEME, R.style.AppTheme_Light));
+      SettingsWrapper settingsWrapper = new SettingsWrapper(this);
+
+      setTheme(settingsWrapper.getThemeId());
+      int a = settingsWrapper.getHistoryLength();
       super.onCreate(savedInstanceState);
-      setContentView(R.layout.activity_main);
       wasJustPaused = false;
+
+      //Drawable wallpaper = WallpaperManager.getInstance(this).getDrawable();
+      //getWindow().setBackgroundDrawable(wallpaper);
+      setContentView(R.layout.activity_main);
 
       FragmentManager fm = getSupportFragmentManager();
       data = (DataFragment) fm.findFragmentByTag(DataFragment.FRAGMENT_TAG);
@@ -119,15 +119,11 @@ public class MainActivity extends AppCompatActivity implements Launchable.AppLis
          fm.beginTransaction().add(data, DataFragment.FRAGMENT_TAG).commit();
       }
 
-      int mode = getIntent().getIntExtra(EXTRA_LAUNCHER_MODE, MODE_STANDARD);
-      switch (mode) {
-         case MODE_STANDARD:
-            columnCount = getResources().getInteger(R.integer.columnStandard);
-            break;
-         case MODE_LARGE:
-            columnCount = getResources().getInteger(R.integer.columnLarge);
-            break;
-      }
+      Resources res = getResources();
+      if (settingsWrapper.getLayoutMode().equals(settingsWrapper.STANDARD_MODE))
+         columnCount = res.getInteger(R.integer.columnStandard);
+      else
+         columnCount = res.getInteger(R.integer.columnLarge);
 
       recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
       launcherAdapter = new AppLauncherAdapter(this);
@@ -136,7 +132,6 @@ public class MainActivity extends AppCompatActivity implements Launchable.AppLis
 
       newAppsStrip = (ViewGroup) findViewById(R.id.newAppsBarStrip);
       popularAppsStrip = (ViewGroup) findViewById(R.id.popularAppsStrip);
-
 
       populateAdapterWithInstalledApps();
       // get apps from 2nd row

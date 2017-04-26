@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+   <string-array name="layout_modes">
+      <item>@string/rb_standard_layout</item>
+      <item>@string/rb_large_layout</item>
+   </string-array>
+
+   <string-array name="layout_modes_values">
+      <item>@string/standard_layout_value</item>
+      <item>@string/large_layout_value</item>
+   </string-array>
+
+   <string-array name="themes">
+      <item>@string/rb_light_text</item>
+      <item>@string/rb_dark_text</item>
+   </string-array>
+
+   <string-array name="themesId">
+      <item>1</item>
+      <item>2</item>
+   </string-array>
+
+</resources>

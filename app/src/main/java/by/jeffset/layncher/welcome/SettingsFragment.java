@@ -6,15 +6,14 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
-import by.jeffset.layncher.MainActivity;
 import by.jeffset.layncher.R;
+import by.jeffset.layncher.settings.SettingsWrapper;
 
 
 public class SettingsFragment extends Fragment {
@@ -40,24 +39,29 @@ public class SettingsFragment extends Fragment {
       RadioButton rbLarge = (RadioButton) root.findViewById(R.id.rbLargeLayout);
       TextView textViewLayoutTip = (TextView) root.findViewById(R.id.textViewLayoutTip);
 
-      boolean isLight = WelcomeActivity.theme == R.style.AppTheme_Light;
+      SettingsWrapper settingsWrapper = new SettingsWrapper(getContext());
+
+      int theme = settingsWrapper.getThemeId();
+      String launcherMode = settingsWrapper.getLayoutMode();
+
+      boolean isLight = theme == R.style.AppTheme_Light;
       rbLight.setChecked(isLight);
       rbDark.setChecked(!isLight);
 
-      boolean isStandard = WelcomeActivity.launcherMode == MainActivity.MODE_STANDARD;
+      boolean isStandard = launcherMode.equals(settingsWrapper.STANDARD_MODE);
       rbStandard.setChecked(isStandard);
       rbLarge.setChecked(!isStandard);
 
       View.OnClickListener lightListener = v -> {
-         WelcomeActivity.theme = R.style.AppTheme_Light;
+         settingsWrapper.setThemeId(R.style.AppTheme_Light);
          boolean changed = rbDark.isChecked();
          rbDark.setChecked(false);
          rbLight.setChecked(true);
-         if (changed)
-            switchTheme();
+
+         if (changed) {switchTheme();}
       };
       View.OnClickListener darkListener = v -> {
-         WelcomeActivity.theme = R.style.AppTheme_Dark;
+         settingsWrapper.setThemeId(R.style.AppTheme_Dark);
          boolean changed = rbLight.isChecked();
          rbDark.setChecked(true);
          rbLight.setChecked(false);
@@ -73,10 +77,10 @@ public class SettingsFragment extends Fragment {
 
       rbStandard.setOnCheckedChangeListener((buttonView, isChecked) -> {
          if (isChecked) {
-            WelcomeActivity.launcherMode = MainActivity.MODE_STANDARD;
+            settingsWrapper.setLayoutMode(settingsWrapper.STANDARD_MODE);
             textViewLayoutTip.setText(R.string.tip_layout_standard);
          } else {
-            WelcomeActivity.launcherMode = MainActivity.MODE_LARGE;
+            settingsWrapper.setLayoutMode(settingsWrapper.LARGE_MODE);
             textViewLayoutTip.setText(R.string.tip_layout_large);
          }
       });
