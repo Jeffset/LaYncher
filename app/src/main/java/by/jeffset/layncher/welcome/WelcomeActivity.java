@@ -110,7 +110,7 @@ public class WelcomeActivity extends AppCompatActivity {
 
    protected void onCreate(Bundle savedInstanceState) {
       int page = getIntent().getIntExtra(EXTRA_STARTUP_PAGE_NUM, 0);
-      AppLauncherAdapter.loadIcons(this, R.color.colorPrimary);
+      //AppLauncherAdapter.loadIcons(this, R.color.colorPrimary);
       theme = page == 0 ? R.style.AppTheme_Light : theme;
       setTheme(theme);
       super.onCreate(savedInstanceState);
