@@ -72,6 +72,10 @@ public class AppLauncherAdapter
       notifyDataSetChanged();
    }
 
+   public void clear() {
+      launchables.clear();
+   }
+
    private Activity activity;
 
    AppLauncherAdapter(AppCompatActivity activity) {

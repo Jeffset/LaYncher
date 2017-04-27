@@ -1,5 +1,6 @@
 package by.jeffset.layncher;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
@@ -16,14 +17,17 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.graphics.Palette;
-import android.util.TypedValue;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.Serializable;
+
+import javax.annotation.Nullable;
 
 /**
  * Created by marco on 25.4.17.
@@ -31,6 +35,30 @@ import java.io.FileOutputStream;
  */
 
 public class InstalledApp implements Launchable {
+   public static class AppIdInfo implements Serializable {
+      public String packageName;
+      public int uid;
+
+      AppIdInfo(@NonNull ApplicationInfo info) {
+         packageName = info.packageName;
+         uid = info.uid;
+      }
+
+      @Override public boolean equals(Object obj) {
+         if (obj instanceof AppIdInfo) {
+            AppIdInfo idInfo = (AppIdInfo) obj;
+            return
+                idInfo.packageName.equals(packageName) &&
+                    idInfo.uid == uid;
+         }
+         return false;
+      }
+
+      @SuppressLint("DefaultLocale") @Override public String toString() {
+         return String.format("%s(%d)", packageName, uid);
+      }
+   }
+
    private static int iconIds[] = {
        R.drawable.icon1, R.drawable.icon2,
        R.drawable.icon3, R.drawable.icon4,
@@ -39,12 +67,7 @@ public class InstalledApp implements Launchable {
        R.drawable.icon9, R.drawable.icon10
    };
 
-
    private static Bitmap mask = null;
-
-   static {
-
-   }
 
    void setListener(AppListener listener) {
       this.listener = listener;
@@ -53,40 +76,24 @@ public class InstalledApp implements Launchable {
    private AppListener listener = null;
 
    @NonNull
-   private final ApplicationInfo applicationInfo;
+   AppIdInfo appIdInfo;
    @NonNull
    private final Context context;
 
    private Drawable icon;
    private CharSequence label;
 
+   private static @Nullable Drawable getIconCached(@NonNull Context context, String id) {
+      File cached = new File(context.getCacheDir(), id + "icon");
+      if (cached.exists()) {
+         return new BitmapDrawable(BitmapFactory.decodeFile(cached.getPath()));
+      }
+      return null;
+   }
+
    @NonNull private static Drawable decorateIcon(@NonNull Drawable original,
                                                  @NonNull Context context,
                                                  @NonNull String id) {
-      /*Resources res = context.getResources();
-      int color = ResourcesCompat.getColor(res, frameColor, null);
-      int radius = res.getDimensionPixelSize(R.dimen.iconCornerRadius);
-      int W = res.getDimensionPixelSize(R.dimen.iconFrameThickness);
-      BitmapFactory.Options options = new BitmapFactory.Options();
-      options.inDensity = 640;
-      Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-      paint.setStyle(Paint.Style.STROKE);
-      paint.setStrokeWidth(W);
-      paint.setColor(color);
-      for (int i = 0; i < iconIds.length; i++) {
-         if (icons[i] == null) {
-            Bitmap source = BitmapFactory.decodeResource(res, iconIds[i], options);
-            int width = source.getWidth();
-            int height = source.getHeight();
-            Bitmap bmp = Bitmap.createBitmap(width, height, source.getConfig());
-            Canvas canvas = new Canvas(bmp);
-            RectF rectF = new RectF(W, W, width - W, height - W);
-            canvas.drawRoundRect(rectF, radius, radius, paint);
-            canvas.drawBitmap(source, 0, 0, null);
-            source.recycle();
-            icons[i] = bmp;
-         }
-      }*/
       File cached = new File(context.getCacheDir(), id + "icon");
       if (cached.exists()) {
          return new BitmapDrawable(BitmapFactory.decodeFile(cached.getPath()));
@@ -137,23 +144,34 @@ public class InstalledApp implements Launchable {
       return new BitmapDrawable(output);
    }
 
-   InstalledApp(@NonNull ApplicationInfo applicationInfo,
-                @NonNull PackageManager pm,
-                @NonNull Context context) {
-      this.applicationInfo = applicationInfo;
+   private InstalledApp(@NonNull ApplicationInfo applicationInfo,
+                        @NonNull Context context) {
+      appIdInfo = new AppIdInfo(applicationInfo);
+      PackageManager pm = context.getPackageManager();
       this.context = context;
-      Drawable iconOriginal = null;
-      try {
-         final Resources res = pm.getResourcesForApplication(applicationInfo);
-         iconOriginal = ResourcesCompat.getDrawable(res, applicationInfo.icon, null);
-      } catch (PackageManager.NameNotFoundException e) {
-         e.printStackTrace();
-      } catch (Resources.NotFoundException e) {
-         e.printStackTrace();
+      icon = getIconCached(context, appIdInfo.toString());
+      if (icon == null) {
+         Drawable iconOriginal = null;
+         try {
+            final Resources res = pm.getResourcesForApplication(applicationInfo);
+            iconOriginal = ResourcesCompat.getDrawable(res, applicationInfo.icon, null);
+         } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+         } catch (Resources.NotFoundException e) {
+            e.printStackTrace();
+         }
+         if (iconOriginal == null) iconOriginal = pm.getApplicationIcon(applicationInfo);
+         icon = decorateIcon(iconOriginal, context, appIdInfo.toString());
       }
-      if (iconOriginal == null) iconOriginal = pm.getApplicationIcon(applicationInfo);
-      icon = decorateIcon(iconOriginal, context, applicationInfo.packageName);
       label = pm.getApplicationLabel(applicationInfo);
+   }
+
+   InstalledApp(@NonNull Context context, @NonNull AppIdInfo info) throws PackageManager.NameNotFoundException {
+      this(context.getPackageManager().getApplicationInfo(info.packageName, PackageManager.GET_META_DATA), context);
+   }
+
+   @Override public boolean equals(Object obj) {
+      return obj instanceof InstalledApp && ((InstalledApp) obj).appIdInfo.equals(appIdInfo);
    }
 
    @Override public Drawable getIcon() {
@@ -167,7 +185,7 @@ public class InstalledApp implements Launchable {
    @Override public boolean launch() {
       if (listener != null)
          listener.onLaunch(this);
-      Intent intent = context.getPackageManager().getLaunchIntentForPackage(applicationInfo.packageName);
+      Intent intent = context.getPackageManager().getLaunchIntentForPackage(appIdInfo.packageName);
       context.startActivity(intent);
       return true;
    }

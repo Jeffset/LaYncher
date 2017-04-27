@@ -1,20 +1,21 @@
 package by.jeffset.layncher;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
+import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,15 +28,24 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Observable;
+import java.util.Observer;
 
 import by.jeffset.layncher.settings.SettingsWrapper;
 
-public class MainActivity extends AppCompatActivity implements Launchable.AppListener {
+public class MainActivity extends AppCompatActivity
+    implements Launchable.AppListener, Observer {
+   public static final String TAG = "LaYncher.AppDataHelper";
+
+   public static final String PERSISTENT_DATA_KEY = "PERSISTENT_DATA";
+
+   AppDataHelper helper;
+   List<InstalledApp> recentApps = new LinkedList<>();
+   List<InstalledApp> newApps = new LinkedList<>();
 
    public void onMenuDeleteClick(MenuItem item) {
-      data.pendingRecentApps.remove(contextApp);
-      data.recentApps.remove(contextApp);
-      data.newApps.remove(contextApp);
+      recentApps.remove(contextApp);
+      newApps.remove(contextApp);
       launcherAdapter.remove(contextApp);
       publishRecentAppsList();
       publishNewAppsList();
@@ -49,19 +59,6 @@ public class MainActivity extends AppCompatActivity implements Launchable.AppLis
           .show();
    }
 
-
-   public static class DataFragment extends Fragment {
-      static final String FRAGMENT_TAG = "by.jeffset.layncher.MainActivity$DataFragment";
-
-      public DataFragment() {
-         setRetainInstance(true);
-      }
-
-      private Deque<InstalledApp> newApps = new LinkedList<>();
-      private Deque<InstalledApp> recentApps = new LinkedList<>();
-      private Deque<InstalledApp> pendingRecentApps = new LinkedList<>();
-   }
-
    @Override public void onCreateContextMenu(ContextMenu menu, View v,
                                              ContextMenu.ContextMenuInfo menuInfo) {
       /*App app = (App) v.getTag(AppLauncherAdapter.APP_TAG_KEY);
@@ -70,7 +67,6 @@ public class MainActivity extends AppCompatActivity implements Launchable.AppLis
       menu.setHeaderTitle(app.label);*/
    }
 
-   DataFragment data;
    InstalledApp contextApp;
    private AppLauncherAdapter launcherAdapter;// = new AppLauncherAdapter(this);
 
@@ -80,23 +76,19 @@ public class MainActivity extends AppCompatActivity implements Launchable.AppLis
 
    private int columnCount;
 
-   private boolean wasJustPaused = false;
 
    private void populateAdapterWithInstalledApps() {
-      // TODO implement background precomputing.
-      Intent launchIntent = new Intent(Intent.ACTION_MAIN);
-      launchIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-      PackageManager pm = getPackageManager();
-      List<ResolveInfo> intentActivities = pm.queryIntentActivities(launchIntent, 0);
-      List<Launchable> apps = new ArrayList<>();
-      apps.add(new SettingsLauncher(this));
-      for (ResolveInfo info : intentActivities) {
-         ApplicationInfo applicationInfo = info.activityInfo.applicationInfo;
-         InstalledApp app = new InstalledApp(applicationInfo, pm, this);
-         app.setListener(this);
-         apps.add(app);
-      }
-      launcherAdapter.add(apps);
+      launcherAdapter.clear();
+      launcherAdapter.add(new SettingsLauncher(this));
+      launcherAdapter.add(helper.getAllApps(this));
+      recentApps = helper.getRecentApps(this);
+      newApps = helper.getNewApps(this);
+   }
+
+   @Override public void onSaveInstanceState(Bundle outState) {
+      super.onSaveInstanceState(outState);
+      Log.i(TAG, "onSaveInstanceState: here");
+      helper.saveData();
    }
 
    @Override
@@ -105,19 +97,16 @@ public class MainActivity extends AppCompatActivity implements Launchable.AppLis
 
       setTheme(settingsWrapper.getThemeId());
       int a = settingsWrapper.getHistoryLength();
+
+
       super.onCreate(savedInstanceState);
-      wasJustPaused = false;
+
+      helper = new AppDataHelper(this);
+      helper.addObserver(this);
 
       //Drawable wallpaper = WallpaperManager.getInstance(this).getDrawable();
       //getWindow().setBackgroundDrawable(wallpaper);
       setContentView(R.layout.activity_main);
-
-      FragmentManager fm = getSupportFragmentManager();
-      data = (DataFragment) fm.findFragmentByTag(DataFragment.FRAGMENT_TAG);
-      if (data == null) {
-         data = new DataFragment();
-         fm.beginTransaction().add(data, DataFragment.FRAGMENT_TAG).commit();
-      }
 
       Resources res = getResources();
       if (settingsWrapper.getLayoutMode().equals(settingsWrapper.STANDARD_MODE))
@@ -151,27 +140,26 @@ public class MainActivity extends AppCompatActivity implements Launchable.AppLis
 
    @Override protected void onResume() {
       super.onResume();
-      if (wasJustPaused) {
+      /*if (wasJustPaused) {
          for (InstalledApp app : data.pendingRecentApps) {
             if (data.recentApps.contains(app))
                data.recentApps.remove(app);
             data.recentApps.addFirst(app);
          }
          data.pendingRecentApps.clear();
-      }
+      }*/
       publishRecentAppsList();
       publishNewAppsList();
    }
 
    @Override protected void onPause() {
       super.onPause();
-      wasJustPaused = true;
    }
 
    private void publishNewAppsList() {
       newAppsStrip.removeAllViews();
       int i = 0;
-      for (InstalledApp app : data.newApps) {
+      for (InstalledApp app : newApps) {
          if (i++ == columnCount) // new strip limit
             break;
          View view = createAppView(app);
@@ -184,7 +172,7 @@ public class MainActivity extends AppCompatActivity implements Launchable.AppLis
    private void publishRecentAppsList() {
       popularAppsStrip.removeAllViews();
       int i = 0;
-      for (InstalledApp app : data.recentApps) {
+      for (InstalledApp app : recentApps) {
          if (i++ == columnCount) // mru strip limit
             break;
          popularAppsStrip.addView(createAppView(app));
@@ -207,18 +195,19 @@ public class MainActivity extends AppCompatActivity implements Launchable.AppLis
    }
 
    @Override public void onLaunch(Launchable launchable) {
-      if (launchable instanceof InstalledApp)
-         addPendingRecentList((InstalledApp) launchable);
+      if (launchable instanceof InstalledApp) {
+         if (!recentApps.contains(launchable)) {
+            recentApps.add((InstalledApp) launchable);
+            helper.setRecentApps(recentApps);
+         }
+      }
    }
 
    @Override public void showMenu(Launchable launchable) {
       // TODO implement context menu logic
    }
 
-   private void addPendingRecentList(InstalledApp app) {
-      data.pendingRecentApps.add(app);
-      /*if (data.recentApps.contains(app))
-         data.recentApps.remove(app);
-      data.recentApps.addFirst(app);*/
+   @Override public void update(Observable o, Object arg) {
+      populateAdapterWithInstalledApps();
    }
 }
