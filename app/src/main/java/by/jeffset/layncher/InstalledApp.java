@@ -1,10 +1,7 @@
 package by.jeffset.layncher;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -17,17 +14,14 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
 import android.support.annotation.NonNull;
-import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.graphics.Palette;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.Serializable;
 
 import javax.annotation.Nullable;
+
+import by.jeffset.layncher.data.AppEntry;
 
 /**
  * Created by marco on 25.4.17.
@@ -35,30 +29,6 @@ import javax.annotation.Nullable;
  */
 
 public class InstalledApp implements Launchable {
-   public static class AppIdInfo implements Serializable {
-      public String packageName;
-      public int uid;
-
-      AppIdInfo(@NonNull ApplicationInfo info) {
-         packageName = info.packageName;
-         uid = info.uid;
-      }
-
-      @Override public boolean equals(Object obj) {
-         if (obj instanceof AppIdInfo) {
-            AppIdInfo idInfo = (AppIdInfo) obj;
-            return
-                idInfo.packageName.equals(packageName) &&
-                    idInfo.uid == uid;
-         }
-         return false;
-      }
-
-      @SuppressLint("DefaultLocale") @Override public String toString() {
-         return String.format("%s(%d)", packageName, uid);
-      }
-   }
-
    private static int iconIds[] = {
        R.drawable.icon1, R.drawable.icon2,
        R.drawable.icon3, R.drawable.icon4,
@@ -76,29 +46,23 @@ public class InstalledApp implements Launchable {
    private AppListener listener = null;
 
    @NonNull
-   AppIdInfo appIdInfo;
+   AppEntry data;
    @NonNull
    private final Context context;
 
    private Drawable icon;
    private CharSequence label;
 
-   private static @Nullable Drawable getIconCached(@NonNull Context context, String id) {
-      File cached = new File(context.getCacheDir(), id + "icon");
+   private @Nullable Drawable getIconCached(@NonNull Context context) {
+      File cached = data.getIconFile(context);
       if (cached.exists()) {
          return new BitmapDrawable(BitmapFactory.decodeFile(cached.getPath()));
       }
       return null;
    }
 
-   @NonNull private static Drawable decorateIcon(@NonNull Drawable original,
-                                                 @NonNull Context context,
-                                                 @NonNull String id) {
-      File cached = new File(context.getCacheDir(), id + "icon");
-      if (cached.exists()) {
-         return new BitmapDrawable(BitmapFactory.decodeFile(cached.getPath()));
-      }
-
+   @NonNull public static Bitmap decorateIcon(@NonNull Drawable original,
+                                              @NonNull Context context) {
       Resources res = context.getResources();
 
       int size = res.getDimensionPixelSize(R.dimen.iconSize);
@@ -135,43 +99,20 @@ public class InstalledApp implements Launchable {
       p.setColor(Color.WHITE);
       canvas.drawBitmap(mask, 0, 0, p);
 
-      try {
-         output.compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(cached));
-      } catch (FileNotFoundException e) {
-         e.printStackTrace();
-      }
-
-      return new BitmapDrawable(output);
+      return output;
    }
 
-   private InstalledApp(@NonNull ApplicationInfo applicationInfo,
-                        @NonNull Context context) {
-      appIdInfo = new AppIdInfo(applicationInfo);
-      PackageManager pm = context.getPackageManager();
+   public InstalledApp(@NonNull AppEntry data,
+                       @NonNull Context context, AppListener listener) {
+      this.data = data;
       this.context = context;
-      icon = getIconCached(context, appIdInfo.toString());
-      if (icon == null) {
-         Drawable iconOriginal = null;
-         try {
-            final Resources res = pm.getResourcesForApplication(applicationInfo);
-            iconOriginal = ResourcesCompat.getDrawable(res, applicationInfo.icon, null);
-         } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-         } catch (Resources.NotFoundException e) {
-            e.printStackTrace();
-         }
-         if (iconOriginal == null) iconOriginal = pm.getApplicationIcon(applicationInfo);
-         icon = decorateIcon(iconOriginal, context, appIdInfo.toString());
-      }
-      label = pm.getApplicationLabel(applicationInfo);
-   }
-
-   InstalledApp(@NonNull Context context, @NonNull AppIdInfo info) throws PackageManager.NameNotFoundException {
-      this(context.getPackageManager().getApplicationInfo(info.packageName, PackageManager.GET_META_DATA), context);
+      icon = getIconCached(context);
+      label = data.label;
+      this.listener = listener;
    }
 
    @Override public boolean equals(Object obj) {
-      return obj instanceof InstalledApp && ((InstalledApp) obj).appIdInfo.equals(appIdInfo);
+      return obj instanceof InstalledApp && ((InstalledApp) obj).data.equals(data);
    }
 
    @Override public Drawable getIcon() {
@@ -185,7 +126,7 @@ public class InstalledApp implements Launchable {
    @Override public boolean launch() {
       if (listener != null)
          listener.onLaunch(this);
-      Intent intent = context.getPackageManager().getLaunchIntentForPackage(appIdInfo.packageName);
+      Intent intent = context.getPackageManager().getLaunchIntentForPackage(data.packageName);
       context.startActivity(intent);
       return true;
    }

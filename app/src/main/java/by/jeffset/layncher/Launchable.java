@@ -7,7 +7,7 @@ import android.graphics.drawable.Drawable;
  * Primary interface for presentation in laYncher
  */
 
-interface Launchable {
+public interface Launchable {
 
    interface AppListener {
       void onLaunch(Launchable launchable);
