@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -18,6 +19,7 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 
 import by.jeffset.layncher.MainActivity;
 import by.jeffset.layncher.R;
+import by.jeffset.layncher.data.DbHelper;
 import by.jeffset.layncher.settings.SettingsWrapper;
 
 public class WelcomeActivity extends AppCompatActivity {
@@ -31,7 +33,12 @@ public class WelcomeActivity extends AppCompatActivity {
    private ValueAnimator pageFlipper;
    private PagerIndicator pagerPagerIndicator;
 
+   Thread calculator;
+
    public void onMainActivityStart(View view) {
+      try {
+         calculator.join();
+      } catch (InterruptedException ignored) {}
       finish();
       SettingsWrapper settingsWrapper = new SettingsWrapper(this);
       settingsWrapper.setWelcomeWasShowed();
@@ -79,28 +86,8 @@ public class WelcomeActivity extends AppCompatActivity {
 
    class PageAnimator implements ViewPager.PageTransformer {
       @Override public void transformPage(View page, float position) {
-         View v;// = page;
-         /*if (!animator.isRunning() && position == 0) {
-            View vv = page.findViewWithTag(ANIMATABLE_TAG);
-            animator.setTarget(vv);
-            animator.start();
-         }
-         if (!animatables.containsKey(page)) {
-            Log.i(TAG, "transformPage: FIND VIEW");
-            animatables.put(page, v);
-         } else
-            v = animatables.get(page);*/
-         if (page.getTag() != null) {
-            v = (View) page.getTag();
-         } else {
-            v = page.findViewWithTag(ANIMATABLE_TAG);
-            page.setTag(v);
-         }
-
-         if (v != null) {
-            v.setTranslationY((Math.abs(position)) * 360.f);
-            v.setAlpha(1.0f - Math.abs(position));
-         }
+         page.setTranslationY((Math.abs(position)) * 360.f);
+         page.setAlpha(1.0f - Math.abs(position));
          pagerPagerIndicator.setActiveView(viewPager.getCurrentItem());
       }
    }
@@ -130,6 +117,12 @@ public class WelcomeActivity extends AppCompatActivity {
       viewPager.setOnTouchListener((v, event) -> true);
       viewPager.setCurrentItem(getIntent().getIntExtra(EXTRA_STARTUP_PAGE_NUM, 0),
           false);
+
+      calculator = new Thread(() -> {
+         SQLiteDatabase justToCreate = new DbHelper(this).getReadableDatabase();
+         justToCreate.close();
+      });
+      calculator.start();
    }
 
    @Override protected void onResume() {
