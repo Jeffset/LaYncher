@@ -3,8 +3,14 @@
           package="by.jeffset.layncher">
 
    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+
+   <permission android:name="by.jeffset.layncher.security.SEARCH_URI_MODIFY_ALL"/>
+   <permission android:name="by.jeffset.layncher.security.SEARCH_URI_ACCESS_ALL"/>
+   <permission android:name="by.jeffset.layncher.security.SEARCH_URI_ACCESS_LAST_DAY"/>
+   <permission android:name="by.jeffset.layncher.security.SEARCH_URI_ACCESS_LAST"/>
+
    <application
-      android:name=".App"
+      android:name=".Application"
       android:allowBackup="true"
       android:icon="@mipmap/ic_launcher"
       android:label="@string/app_name"
@@ -23,8 +29,58 @@
       <activity
          android:name=".MainActivity"
          android:launchMode="singleInstance">
+         <intent-filter>
+            <category android:name="android.intent.category.DEFAULT"/>
+            <category android:name="android.intent.category.HOME"/>
+         </intent-filter>
       </activity>
-      <activity android:name=".settings.SettingsActivity"/>
+      <activity
+         android:name=".settings.SettingsActivity"
+         android:icon="@drawable/icon"
+         android:label="Settings">
+         <intent-filter>
+            <action android:name="android.intent.action.MAIN"/>
+
+            <category android:name="android.intent.category.LAUNCHER"/>
+         </intent-filter>
+      </activity>
+
+      <provider
+         android:name=".data.InternalContentProvider"
+         android:authorities="by.jeffset.layncher.private"
+         android:enabled="true"
+         android:exported="false">
+      </provider>
+
+      <receiver
+         android:name=".data.AppsBroadcastReceiver"
+         android:enabled="true"
+         android:exported="true">
+         <intent-filter android:priority="999">
+            <action android:name="android.intent.action.PACKAGE_ADDED"/>
+            <action android:name="android.intent.action.PACKAGE_REMOVED"/>
+
+            <data android:scheme="package"/>
+         </intent-filter>
+      </receiver>
+
+      <provider
+         android:name=".data.SearchUriContentProvider"
+         android:authorities="by.jeffset.layncher"
+         android:enabled="true"
+         android:exported="true"
+         android:writePermission="by.jeffset.layncher.security.SEARCH_URI_MODIFY">
+         <path-permission
+            android:pathPrefix="/search"
+            android:readPermission="by.jeffset.layncher.security.SEARCH_URI_ACCESS_ALL"
+            android:writePermission="by.jeffset.layncher.security.SEARCH_URI_MODIFY_ALL"/>
+         <path-permission
+            android:pathPrefix="/search/lastDay"
+            android:readPermission="by.jeffset.layncher.security.SEARCH_URI_ACCESS_LAST_DAY"/>
+         <path-permission
+            android:pathPrefix="/search/lastDay/last"
+            android:readPermission="by.jeffset.layncher.security.SEARCH_URI_ACCESS_LAST"/>
+      </provider>
    </application>
 
 </manifest>

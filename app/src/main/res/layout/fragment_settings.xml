@@ -5,7 +5,7 @@
    android:layout_width="match_parent"
    android:layout_height="match_parent"
    android:orientation="vertical"
-   tools:context="by.jeffset.layncher.welcome.WelcomeActivity"
+   tools:activity="by.jeffset.layncher.welcome.WelcomeActivity"
    >
 
    <TextView

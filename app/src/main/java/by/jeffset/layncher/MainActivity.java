@@ -10,15 +10,12 @@ import android.view.View;
 
 import by.jeffset.layncher.settings.SettingsWrapper;
 
-public class MainActivity extends AppCompatActivity
-    implements FavouriteAppsFragment.FragmentNotifier {
+public class MainActivity extends AppCompatActivity {
    public static final String TAG = "LaYncher.AppDataHelper";
    private FavouriteAppsFragment favouriteAppsFragment = new FavouriteAppsFragment();
    private MainAppListFragment mainAppListFragment = MainAppListFragment.newInstance();
 
-   @Override public void notifyFragment() {
-      favouriteAppsFragment.reloadFavourites();
-   }
+
 
    class PagerAdapterWithFaves extends FragmentPagerAdapter {
       public PagerAdapterWithFaves(FragmentManager fm) {

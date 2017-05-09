@@ -3,8 +3,8 @@ package by.jeffset.layncher.welcome;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
+import android.content.ContentValues;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -17,9 +17,12 @@ import android.util.Log;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 
+import java.util.List;
+
 import by.jeffset.layncher.MainActivity;
 import by.jeffset.layncher.R;
-import by.jeffset.layncher.data.DbHelper;
+import by.jeffset.layncher.data.AppProcessor;
+import by.jeffset.layncher.data.AppsContract;
 import by.jeffset.layncher.settings.SettingsWrapper;
 
 public class WelcomeActivity extends AppCompatActivity {
@@ -57,7 +60,6 @@ public class WelcomeActivity extends AppCompatActivity {
          switch (position) {
             case 0:
                Log.i(TAG, "getItem: 0");
-               //return GreetingsFragment.newInstance();
                return InfoFragment.newInstance(getString(R.string.welcome_to_layncher),
                    ResourcesCompat.getColor(getResources(), R.color.colorPrimary, null),
                    R.layout.fragment_greetings);
@@ -115,14 +117,18 @@ public class WelcomeActivity extends AppCompatActivity {
       viewPager.setAdapter(adapter);
       viewPager.setPageTransformer(false, new PageAnimator());
       viewPager.setOnTouchListener((v, event) -> true);
-      viewPager.setCurrentItem(getIntent().getIntExtra(EXTRA_STARTUP_PAGE_NUM, 0),
+      int startupPage = getIntent().getIntExtra(EXTRA_STARTUP_PAGE_NUM, 0);
+      viewPager.setCurrentItem(startupPage,
           false);
 
-      calculator = new Thread(() -> {
-         SQLiteDatabase justToCreate = new DbHelper(this).getReadableDatabase();
-         justToCreate.close();
-      });
-      calculator.start();
+      if (startupPage == 0) {
+         calculator = new Thread(() -> {
+            List<ContentValues> valuesList = AppProcessor.processApps(this, null);
+            for (ContentValues values : valuesList)
+               getContentResolver().insert(AppsContract.APPS_URI, values);
+         });
+         calculator.start();
+      }
    }
 
    @Override protected void onResume() {

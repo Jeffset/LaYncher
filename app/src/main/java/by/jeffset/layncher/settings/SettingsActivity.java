@@ -1,6 +1,8 @@
 package by.jeffset.layncher.settings;
 
+import android.app.Activity;
 import android.app.Fragment;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
@@ -14,12 +16,9 @@ import android.widget.Toast;
 
 import by.jeffset.layncher.MainActivity;
 import by.jeffset.layncher.R;
+import by.jeffset.layncher.data.AppsContract;
 import by.jeffset.layncher.data.DbHelper;
-
-/**
- * Created by marco on 26.4.17.
- * dsdsdsdsd
- */
+import by.jeffset.layncher.data.SearchContract;
 
 public class SettingsActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
    @Override protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -33,19 +32,25 @@ public class SettingsActivity extends AppCompatActivity implements SharedPrefere
 
    @Override public void onBackPressed() {
       super.onBackPressed();
-      startActivity(new Intent(this, MainActivity.class));
-      overridePendingTransition(0, 0);
+      Activity parent = getParent();
+      if (parent instanceof MainActivity) {
+         parent.finish();
+         startActivity(new Intent(this, MainActivity.class));
+         overridePendingTransition(0, 0);
+      }
    }
 
    public void onClearSearchHistory(View view) {
       SQLiteDatabase database = new DbHelper(this).getWritableDatabase();
-      DbHelper.resetUriHistory(database);
-      Toast.makeText(this, "Cleared", Toast.LENGTH_SHORT).show();
+      int count = getContentResolver().delete(SearchContract.ALL_URI, null, null);
+      //DbHelper.resetUriHistory(database);
+      Toast.makeText(this, "Cleared " + count + " item(s)", Toast.LENGTH_SHORT).show();
    }
 
    public void onClearFavouriteApps(View view) {
-      SQLiteDatabase database = new DbHelper(this).getWritableDatabase();
-      DbHelper.updateResetAllFavourite(database);
+      ContentValues values = new ContentValues();
+      values.put(AppsContract.App.IS_FAVOURITE, false);
+      getContentResolver().update(AppsContract.APPS_URI, values, null, null);
       Toast.makeText(this, "Cleared", Toast.LENGTH_SHORT).show();
    }
 
@@ -53,7 +58,7 @@ public class SettingsActivity extends AppCompatActivity implements SharedPrefere
       if (key.equals(getString(R.string.pref_theme_key))) {
          finish();
          overridePendingTransition(0, 0);
-         startActivity(new Intent(this, getClass()));
+         startActivity(getIntent());
          overridePendingTransition(0, 0);
       }
    }
