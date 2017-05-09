@@ -5,6 +5,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import by.jeffset.data.SearchContract;
+
 import static by.jeffset.layncher.MainActivity.TAG;
 
 /**

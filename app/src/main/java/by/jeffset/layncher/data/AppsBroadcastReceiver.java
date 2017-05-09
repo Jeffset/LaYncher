@@ -28,6 +28,8 @@ public class AppsBroadcastReceiver extends BroadcastReceiver {
    }
 
    private void onInstall(Context context, String packageName) {
+      if (packageName.equals("by.jeffset.layncher"))
+         return;
       final PendingResult async = goAsync();
       new Thread(() -> {
          try {

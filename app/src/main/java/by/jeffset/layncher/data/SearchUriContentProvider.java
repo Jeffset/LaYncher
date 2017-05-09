@@ -9,8 +9,13 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import java.util.Calendar;
+
+import by.jeffset.data.SearchContract;
+
+import static by.jeffset.layncher.MainActivity.TAG;
 
 public class SearchUriContentProvider extends ContentProvider {
    private static final UriMatcher uriMatcher = new UriMatcher(0);
@@ -72,9 +77,12 @@ public class SearchUriContentProvider extends ContentProvider {
 
 
    private static long getDayStart() {
-      Calendar calendar = Calendar.getInstance();
-      calendar.set(Calendar.HOUR_OF_DAY, 0);
-      return calendar.getTimeInMillis();
+      Calendar c = Calendar.getInstance();
+      c.set(Calendar.HOUR_OF_DAY, 0);
+      c.set(Calendar.MINUTE, 0);
+      c.set(Calendar.SECOND, 0);
+      c.set(Calendar.MILLISECOND, 0);
+      return c.getTimeInMillis();
    }
 
    @Override
@@ -82,12 +90,16 @@ public class SearchUriContentProvider extends ContentProvider {
                        String[] selectionArgs, String sortOrder) {
       switch (uriMatcher.match(uri)) {
          case LAST_ONE_CODE:
+            Log.i(TAG, "query: one uri");
             return queryImpl(projection, selection, selectionArgs,
                 SearchContract.Search.TIME + " DESC LIMIT 1");
          case LAST_DAY_CODE: //  TODO implement in proper way
+            long dayStart = getDayStart();
+            Log.i(TAG, "query: now = " + System.currentTimeMillis());
+            Log.i(TAG, "query: startDay = " + dayStart);
             return queryImpl(projection, SearchContract.Search.TIME + ">?",
-                new String[]{String.valueOf(getDayStart())},
-                SearchContract.Search.TIME + " DESC LIMIT 1");
+                new String[]{String.valueOf(dayStart)},
+                SearchContract.Search.TIME + " DESC");
          case ALL_CODE:
             return queryImpl(projection, selection, selectionArgs, sortOrder);
          default:

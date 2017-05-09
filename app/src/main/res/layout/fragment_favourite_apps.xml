@@ -1,44 +1,61 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
-              xmlns:tools="http://schemas.android.com/tools"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="vertical"
-              tools:activity="by.jeffset.layncher.FavouriteAppsFragment">
+<android.support.design.widget.CoordinatorLayout
+   xmlns:android="http://schemas.android.com/apk/res/android"
+   xmlns:app="http://schemas.android.com/apk/res-auto"
+   xmlns:tools="http://schemas.android.com/tools"
+   android:layout_width="match_parent"
+   android:layout_height="match_parent">
 
-   <TextView
+   <LinearLayout
       android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_marginTop="16dp"
-      android:gravity="center"
-      android:text="Favourites screen"
-      android:textAppearance="?android:textAppearanceLarge"/>
+      android:layout_height="match_parent"
+      android:orientation="vertical"
+      tools:activity="by.jeffset.layncher.FavouriteAppsFragment">
 
-   <android.support.v7.widget.CardView
-      android:layout_width="match_parent"
-      android:layout_height="0dp"
-      android:layout_margin="16dp"
-      android:layout_weight="1"
-      app:cardBackgroundColor="?colorNewAppsStrip"
-      app:cardCornerRadius="5dp">
-
-      <android.support.v7.widget.RecyclerView
-         android:id="@+id/recyclerView"
+      <TextView
          android:layout_width="match_parent"
-         android:layout_height="match_parent"
-         android:layout_margin="6dp"/>
-   </android.support.v7.widget.CardView>
+         android:layout_height="wrap_content"
+         android:layout_marginTop="16dp"
+         android:gravity="center"
+         android:text="Favourites screen"
+         android:textAppearance="?android:textAppearanceLarge"/>
 
-   <AutoCompleteTextView
-      android:id="@+id/autoCompleteTextView"
-      android:layout_width="match_parent"
-      android:layout_marginStart="6dp"
-      android:layout_marginEnd="6dp"
-      android:layout_marginBottom="6dp"
-      android:layout_height="wrap_content"
-      android:hint="Enter some uri..."
-      android:imeOptions="actionDone"
-      android:inputType="textUri"
-      android:maxLines="1"/>
+      <android.support.v7.widget.CardView
+         android:layout_width="match_parent"
+         android:layout_height="0dp"
+         android:layout_margin="16dp"
+         android:layout_weight="1"
+         app:cardBackgroundColor="?colorNewAppsStrip"
+         app:cardCornerRadius="5dp">
 
-</LinearLayout>
+         <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="6dp"/>
+      </android.support.v7.widget.CardView>
+
+      <AutoCompleteTextView
+         android:id="@+id/autoCompleteTextView"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:layout_marginBottom="6dp"
+         android:layout_marginEnd="6dp"
+         android:layout_marginStart="6dp"
+         android:hint="Enter some uri..."
+         android:imeOptions="actionDone"
+         android:inputType="textUri"
+         android:maxLines="1"/>
+
+   </LinearLayout>
+   <android.support.design.widget.FloatingActionButton
+      android:layout_width="50dp"
+      android:layout_height="50dp"
+      app:elevation="20dp"
+      android:onClick="addContact"
+      android:layout_margin="20dp"
+      android:src="@android:drawable/stat_sys_phone_call"
+      app:layout_anchor="@id/recyclerView"
+      app:layout_anchorGravity="bottom|end"
+      />
+</android.support.design.widget.CoordinatorLayout>
+

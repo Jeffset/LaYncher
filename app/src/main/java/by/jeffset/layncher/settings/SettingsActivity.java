@@ -1,9 +1,7 @@
 package by.jeffset.layncher.settings;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.content.ContentValues;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -14,11 +12,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Toast;
 
-import by.jeffset.layncher.MainActivity;
+import by.jeffset.data.SearchContract;
 import by.jeffset.layncher.R;
 import by.jeffset.layncher.data.AppsContract;
 import by.jeffset.layncher.data.DbHelper;
-import by.jeffset.layncher.data.SearchContract;
 
 public class SettingsActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
    @Override protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -30,15 +27,6 @@ public class SettingsActivity extends AppCompatActivity implements SharedPrefere
       setContentView(R.layout.activity_settings);
    }
 
-   @Override public void onBackPressed() {
-      super.onBackPressed();
-      Activity parent = getParent();
-      if (parent instanceof MainActivity) {
-         parent.finish();
-         startActivity(new Intent(this, MainActivity.class));
-         overridePendingTransition(0, 0);
-      }
-   }
 
    public void onClearSearchHistory(View view) {
       SQLiteDatabase database = new DbHelper(this).getWritableDatabase();
@@ -57,9 +45,9 @@ public class SettingsActivity extends AppCompatActivity implements SharedPrefere
    @Override public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
       if (key.equals(getString(R.string.pref_theme_key))) {
          finish();
-         overridePendingTransition(0, 0);
+         /*overridePendingTransition(0, 0);
          startActivity(getIntent());
-         overridePendingTransition(0, 0);
+         overridePendingTransition(0, 0);*/
       }
    }
 

@@ -60,4 +60,15 @@
       android:layout_height="match_parent"
       app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
+   <android.support.design.widget.FloatingActionButton
+      android:layout_width="40dp"
+      android:layout_height="40dp"
+      android:layout_margin="10dp"
+      android:onClick="settings"
+      app:srcCompat="@drawable/icon"
+      app:elevation="20dp"
+      app:layout_anchor="@id/popularAppsStrip"
+      app:layout_anchorGravity="top|end"
+      />
+
 </android.support.design.widget.CoordinatorLayout>

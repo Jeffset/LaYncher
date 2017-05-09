@@ -3,8 +3,11 @@ package by.jeffset.layncher.welcome;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -36,17 +39,40 @@ public class WelcomeActivity extends AppCompatActivity {
    private ValueAnimator pageFlipper;
    private PagerIndicator pagerPagerIndicator;
 
-   Thread calculator;
-
    public void onMainActivityStart(View view) {
-      try {
-         calculator.join();
-      } catch (InterruptedException ignored) {}
-      finish();
-      SettingsWrapper settingsWrapper = new SettingsWrapper(this);
-      settingsWrapper.setWelcomeWasShowed();
-      Intent intent = new Intent(this, MainActivity.class);
-      startActivity(intent);
+      view.setEnabled(false);
+      ProgressDialog dialog = new ProgressDialog(this);
+      dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+      dialog.setIndeterminate(true);
+      dialog.setMessage("Rendering icons...");
+      dialog.setCancelable(false);
+      dialog.show();
+      @SuppressLint("StaticFieldLeak")
+      AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
+         @Override protected Void doInBackground(Void... voids) {
+            List<ContentValues> valuesList =
+                AppProcessor.processApps(WelcomeActivity.this, null);
+            getContentResolver().delete(AppsContract.APPS_URI, null, null);
+            for (ContentValues values : valuesList)
+               getContentResolver().insert(AppsContract.APPS_URI, values);
+            new SettingsWrapper(WelcomeActivity.this).setInitDone(true);
+            return null;
+         }
+
+         @Override protected void onProgressUpdate(Void... values) {
+            dialog.setProgress(50);
+         }
+
+         @Override protected void onPostExecute(Void v) {
+            dialog.dismiss();
+            finish();
+            SettingsWrapper settingsWrapper = new SettingsWrapper(WelcomeActivity.this);
+            settingsWrapper.setWelcomeWasShowed();
+            Intent intent = new Intent(WelcomeActivity.this, MainActivity.class);
+            startActivity(intent);
+         }
+      };
+      asyncTask.execute();
    }
 
    class WelcomePagerAdapter extends FragmentPagerAdapter {
@@ -104,8 +130,6 @@ public class WelcomeActivity extends AppCompatActivity {
          return;
       }
 
-      //AppLauncherAdapter.loadIcons(this, R.color.colorPrimary);
-      //theme = (page == 0 ? R.style.AppTheme_Light : theme);
       setTheme(settingsWrapper.getThemeId());
       super.onCreate(savedInstanceState);
       setContentView(R.layout.activity_welcome);
@@ -120,15 +144,6 @@ public class WelcomeActivity extends AppCompatActivity {
       int startupPage = getIntent().getIntExtra(EXTRA_STARTUP_PAGE_NUM, 0);
       viewPager.setCurrentItem(startupPage,
           false);
-
-      if (startupPage == 0) {
-         calculator = new Thread(() -> {
-            List<ContentValues> valuesList = AppProcessor.processApps(this, null);
-            for (ContentValues values : valuesList)
-               getContentResolver().insert(AppsContract.APPS_URI, values);
-         });
-         calculator.start();
-      }
    }
 
    @Override protected void onResume() {

@@ -5,11 +5,7 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.support.annotation.StringRes;
 import android.support.annotation.StyleRes;
-import android.util.Log;
-
-import java.util.Objects;
 
 import by.jeffset.layncher.R;
 import by.jeffset.layncher.welcome.WelcomeActivity;
@@ -43,9 +39,9 @@ public class SettingsWrapper {
       return prefs.getBoolean(res.getString(R.string.pref_show_faves_key), true);
    }
 
-   public boolean isWelcomeShowed() {
-      return prefs.getBoolean(WelcomeActivity.PREFS_WELCOME_SHOWED, false);
-   }
+   public boolean wasInitDone() {return prefs.getBoolean("layncher.jobDone", false);}
+
+   public void setInitDone(boolean value) {prefs.edit().putBoolean("layncher.jobDone", value).apply();}
 
    public boolean wasWelcomeShowed() {
       return prefs.getBoolean(WelcomeActivity.PREFS_WELCOME_SHOWED, false);

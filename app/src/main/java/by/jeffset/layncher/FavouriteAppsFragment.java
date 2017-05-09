@@ -20,8 +20,8 @@ import android.widget.CursorAdapter;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
+import by.jeffset.data.SearchContract;
 import by.jeffset.layncher.data.AppsContract;
-import by.jeffset.layncher.data.SearchContract;
 import by.jeffset.layncher.settings.SettingsWrapper;
 
 

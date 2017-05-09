@@ -3,6 +3,8 @@
           package="by.jeffset.layncher">
 
    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+   <uses-permission android:name="android.permission.CALL_PHONE"/>
+   <uses-permission android:name="android.permission.READ_CONTACTS" />
 
    <permission android:name="by.jeffset.layncher.security.SEARCH_URI_MODIFY_ALL"/>
    <permission android:name="by.jeffset.layncher.security.SEARCH_URI_ACCESS_ALL"/>
@@ -38,11 +40,6 @@
          android:name=".settings.SettingsActivity"
          android:icon="@drawable/icon"
          android:label="Settings">
-         <intent-filter>
-            <action android:name="android.intent.action.MAIN"/>
-
-            <category android:name="android.intent.category.LAUNCHER"/>
-         </intent-filter>
       </activity>
 
       <provider
@@ -69,11 +66,8 @@
          android:authorities="by.jeffset.layncher"
          android:enabled="true"
          android:exported="true"
-         android:writePermission="by.jeffset.layncher.security.SEARCH_URI_MODIFY">
-         <path-permission
-            android:pathPrefix="/search"
-            android:readPermission="by.jeffset.layncher.security.SEARCH_URI_ACCESS_ALL"
-            android:writePermission="by.jeffset.layncher.security.SEARCH_URI_MODIFY_ALL"/>
+         android:readPermission="by.jeffset.layncher.security.SEARCH_URI_ACCESS_ALL"
+         android:writePermission="by.jeffset.layncher.security.SEARCH_URI_MODIFY_ALL">
          <path-permission
             android:pathPrefix="/search/lastDay"
             android:readPermission="by.jeffset.layncher.security.SEARCH_URI_ACCESS_LAST_DAY"/>

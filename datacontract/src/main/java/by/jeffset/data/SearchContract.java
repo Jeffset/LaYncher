@@ -1,4 +1,4 @@
-package by.jeffset.layncher.data;
+package by.jeffset.data;
 
 import android.net.Uri;
 import android.provider.BaseColumns;
