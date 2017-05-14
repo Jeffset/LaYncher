@@ -4,7 +4,7 @@
 
    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
    <uses-permission android:name="android.permission.CALL_PHONE"/>
-   <uses-permission android:name="android.permission.READ_CONTACTS" />
+   <uses-permission android:name="android.permission.READ_CONTACTS"/>
 
    <permission android:name="by.jeffset.layncher.security.SEARCH_URI_MODIFY_ALL"/>
    <permission android:name="by.jeffset.layncher.security.SEARCH_URI_ACCESS_ALL"/>
@@ -22,9 +22,6 @@
       <activity android:name=".welcome.WelcomeActivity">
          <intent-filter>
             <action android:name="android.intent.action.MAIN"/>
-
-            <category android:name="android.intent.category.DEFAULT"/>
-            <category android:name="android.intent.category.HOME"/>
             <category android:name="android.intent.category.LAUNCHER"/>
          </intent-filter>
       </activity>
@@ -32,6 +29,9 @@
          android:name=".MainActivity"
          android:launchMode="singleInstance">
          <intent-filter>
+            <action android:name="android.intent.action.MAIN"/>
+            <data android:name="android.content.Intent.FLAG_ACTIVITY_NO_ANIMATION"/>
+
             <category android:name="android.intent.category.DEFAULT"/>
             <category android:name="android.intent.category.HOME"/>
          </intent-filter>
@@ -75,6 +75,11 @@
             android:pathPrefix="/search/lastDay/last"
             android:readPermission="by.jeffset.layncher.security.SEARCH_URI_ACCESS_LAST"/>
       </provider>
+
+      <service
+         android:name=".data.AppProcessorService"
+         android:exported="false"
+         />
    </application>
 
 </manifest>

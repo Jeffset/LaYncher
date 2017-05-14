@@ -13,7 +13,9 @@ import android.provider.Settings;
 
 import by.jeffset.layncher.data.AppsContract;
 
+
 public abstract class AppListFragment extends Fragment implements AppListAdapter.AppViewListener {
+
    @Override public void onClick(String packageName, String activityName, int appId) {
       AsyncTask.execute(() -> {
          ContentValues values = new ContentValues();
@@ -23,7 +25,13 @@ public abstract class AppListFragment extends Fragment implements AppListAdapter
       });
       Intent intent = new Intent(Intent.ACTION_MAIN);
       intent.setComponent(new ComponentName(packageName, activityName));
+      intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
       startActivity(intent);
+   }
+
+   @Override public void onResume() {
+      super.onResume();
+      getActivity().overridePendingTransition(0, 0);
    }
 
    @Override public boolean onLongClick(String packageName, int appId, Drawable icon, boolean isFavourite) {

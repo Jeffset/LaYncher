@@ -1,12 +1,9 @@
 package by.jeffset.layncher.data;
 
 import android.content.BroadcastReceiver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
-
-import java.util.List;
 
 import static by.jeffset.layncher.MainActivity.TAG;
 
@@ -28,9 +25,13 @@ public class AppsBroadcastReceiver extends BroadcastReceiver {
    }
 
    private void onInstall(Context context, String packageName) {
-      if (packageName.equals("by.jeffset.layncher"))
+      if (packageName.equals(context.getPackageName()))
          return;
-      final PendingResult async = goAsync();
+      Intent intent = new Intent(context, AppProcessorService.class);
+      intent.putExtra(AppProcessorService.JOB_TYPE_EXTRA, AppProcessorService.PROCESS_PACKAGE);
+      intent.putExtra(AppProcessorService.PACKAGE_NAME_EXTRA, packageName);
+      context.startService(intent);
+      /*final PendingResult async = goAsync();
       new Thread(() -> {
          try {
             List<ContentValues> valuesList = AppProcessor.processApps(context, packageName);
@@ -42,7 +43,7 @@ public class AppsBroadcastReceiver extends BroadcastReceiver {
          } finally {
             async.finish();
          }
-      }).start();
+      }).start();*/
    }
 
    private void onUninstall(Context context, String packageName) {

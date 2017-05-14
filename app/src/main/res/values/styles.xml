@@ -5,6 +5,7 @@
       <attr name="colorRecentAppsStrip" format="color"/>
       <attr name="colorIndicatorSelected" format="color"/>
       <attr name="colorIndicatorInactive" format="color"/>
+      <attr name="colorFavourite" format="color"/>
    </declare-styleable>
 
    <!-- Base application theme. -->
@@ -25,6 +26,7 @@
       <item name="colorRecentAppsStrip">@color/colorRecentAppStrip.Light</item>
       <item name="colorIndicatorSelected">@color/colorIndicatorSelected.Light</item>
       <item name="colorIndicatorInactive">@color/colorIndicatorInactive.Light</item>
+      <item name="colorFavourite">@color/colorFavourite.Light</item>
    </style>
 
    <style name="AppTheme.Dark" parent="Theme.AppCompat.NoActionBar">
@@ -36,6 +38,7 @@
       <item name="colorRecentAppsStrip">@color/colorRecentAppStrip.Dark</item>
       <item name="colorIndicatorSelected">@color/colorIndicatorSelected.Dark</item>
       <item name="colorIndicatorInactive">@color/colorIndicatorInactive.Dark</item>
+      <item name="colorFavourite">@color/colorFavourite.Dark</item>
    </style>
 
 

@@ -14,13 +14,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 
+import by.jeffset.layncher.data.AppProcessorService;
 import by.jeffset.layncher.settings.SettingsActivity;
 import by.jeffset.layncher.settings.SettingsWrapper;
 
 public class MainActivity extends AppCompatActivity {
    public static final String TAG = "LaYncher.AppDataHelper";
-   private FavouriteAppsFragment favouriteAppsFragment = new FavouriteAppsFragment();
-   private MainAppListFragment mainAppListFragment = MainAppListFragment.newInstance();
+   public static final int SETTINGS_REQ = 228;
 
    public void addContact(View view) {
       Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
@@ -46,29 +46,30 @@ public class MainActivity extends AppCompatActivity {
             cur.close();
             break;
          }
-         case 228: {
-            finish();
-            startActivity(getIntent());
+         case SETTINGS_REQ: {
+            if (resultCode == SettingsActivity.NEED_RELAUNCH) {
+               finish();
+               startActivity(getIntent());
+            }
          }
       }
    }
 
    public void settings(View view) {
-      startActivityForResult(new Intent(this, SettingsActivity.class), 228);
+      startActivityForResult(new Intent(this, SettingsActivity.class), SETTINGS_REQ);
    }
 
-
-   class PagerAdapterWithFaves extends FragmentPagerAdapter {
-      public PagerAdapterWithFaves(FragmentManager fm) {
+   private class PagerAdapterWithFaves extends FragmentPagerAdapter {
+      PagerAdapterWithFaves(FragmentManager fm) {
          super(fm);
       }
 
       @Override public Fragment getItem(int position) {
          switch (position) {
             case 0:
-               return mainAppListFragment;
+               return MainAppListFragment.newInstance();
             case 1:
-               return favouriteAppsFragment;
+               return new FavouriteAppsFragment();
          }
          return null;
       }
@@ -76,15 +77,16 @@ public class MainActivity extends AppCompatActivity {
       @Override public int getCount() {
          return 2;
       }
+
    }
 
-   class PagerAdapterStub extends FragmentPagerAdapter {
-      public PagerAdapterStub(FragmentManager fm) {
+   private class PagerAdapterStub extends FragmentPagerAdapter {
+      PagerAdapterStub(FragmentManager fm) {
          super(fm);
       }
 
       @Override public Fragment getItem(int position) {
-         return mainAppListFragment;
+         return MainAppListFragment.newInstance();
       }
 
       @Override public int getCount() {
@@ -92,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
       }
    }
 
-   class PageAnimator implements ViewPager.PageTransformer {
+   private class PageAnimator implements ViewPager.PageTransformer {
       @Override public void transformPage(View page, float position) {
          page.setTranslationY((Math.abs(position)) * -360.f);
          page.setAlpha(1.0f - Math.abs(position));
@@ -101,16 +103,20 @@ public class MainActivity extends AppCompatActivity {
 
    @Override
    protected void onCreate(Bundle savedInstanceState) {
+      startService(new Intent(this, AppProcessorService.class));
       SettingsWrapper settingsWrapper = new SettingsWrapper(this);
       setTheme(settingsWrapper.getThemeId());
       super.onCreate(savedInstanceState);
       setContentView(R.layout.activity_main);
 
       ViewPager pager = (ViewPager) findViewById(R.id.viewPager);
-      pager.setAdapter(settingsWrapper.isShowFaves() ?
-          new PagerAdapterWithFaves(getFragmentManager())
-          :
-          new PagerAdapterStub(getFragmentManager()));
+      if (settingsWrapper.isShowFaves()) {
+         PagerAdapterWithFaves adapter = new PagerAdapterWithFaves(getFragmentManager());
+         pager.setAdapter(adapter);
+      } else {
+         PagerAdapterStub adapter = new PagerAdapterStub(getFragmentManager());
+         pager.setAdapter(adapter);
+      }
       pager.setPageTransformer(false, new PageAnimator());
       pager.setCurrentItem(0);
    }

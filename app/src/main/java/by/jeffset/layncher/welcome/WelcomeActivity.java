@@ -3,29 +3,27 @@ package by.jeffset.layncher.welcome;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
-import android.annotation.SuppressLint;
-import android.app.ProgressDialog;
-import android.content.ContentValues;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
-
-import java.util.List;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import by.jeffset.layncher.MainActivity;
 import by.jeffset.layncher.R;
-import by.jeffset.layncher.data.AppProcessor;
-import by.jeffset.layncher.data.AppsContract;
+import by.jeffset.layncher.data.AppProcessorService;
 import by.jeffset.layncher.settings.SettingsWrapper;
 
 public class WelcomeActivity extends AppCompatActivity {
@@ -39,40 +37,35 @@ public class WelcomeActivity extends AppCompatActivity {
    private ValueAnimator pageFlipper;
    private PagerIndicator pagerPagerIndicator;
 
+   private ProgressBar progressBar;
+   private TextView textViewProgress;
+   private BroadcastReceiver appsJobReceiver;
+
+   private class AppsJobBroadcastReceiver extends BroadcastReceiver {
+      @Override public void onReceive(Context context, Intent intent) {
+         switch (intent.getAction()) {
+            case AppProcessorService.FINISHED: {
+               progressBar.setVisibility(View.GONE);
+               textViewProgress.setText("everything is ready now");
+               break;
+            }
+            case AppProcessorService.PROGRESS: {
+               int progress = intent.getIntExtra(AppProcessorService.PROGRESS_VALUE_EXTRA, 0);
+               progressBar.setIndeterminate(false);
+               progressBar.setProgress(progress);
+               textViewProgress.setText(String.format("%d %%", progress));
+               break;
+            }
+         }
+
+      }
+   }
+
    public void onMainActivityStart(View view) {
-      view.setEnabled(false);
-      ProgressDialog dialog = new ProgressDialog(this);
-      dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-      dialog.setIndeterminate(true);
-      dialog.setMessage("Rendering icons...");
-      dialog.setCancelable(false);
-      dialog.show();
-      @SuppressLint("StaticFieldLeak")
-      AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
-         @Override protected Void doInBackground(Void... voids) {
-            List<ContentValues> valuesList =
-                AppProcessor.processApps(WelcomeActivity.this, null);
-            getContentResolver().delete(AppsContract.APPS_URI, null, null);
-            for (ContentValues values : valuesList)
-               getContentResolver().insert(AppsContract.APPS_URI, values);
-            new SettingsWrapper(WelcomeActivity.this).setInitDone(true);
-            return null;
-         }
-
-         @Override protected void onProgressUpdate(Void... values) {
-            dialog.setProgress(50);
-         }
-
-         @Override protected void onPostExecute(Void v) {
-            dialog.dismiss();
-            finish();
-            SettingsWrapper settingsWrapper = new SettingsWrapper(WelcomeActivity.this);
-            settingsWrapper.setWelcomeWasShowed();
-            Intent intent = new Intent(WelcomeActivity.this, MainActivity.class);
-            startActivity(intent);
-         }
-      };
-      asyncTask.execute();
+      new SettingsWrapper(WelcomeActivity.this).setWelcomeWasShowed();
+      finish();
+      Intent mainIntent = new Intent(WelcomeActivity.this, MainActivity.class);
+      startActivity(mainIntent);
    }
 
    class WelcomePagerAdapter extends FragmentPagerAdapter {
@@ -144,10 +137,23 @@ public class WelcomeActivity extends AppCompatActivity {
       int startupPage = getIntent().getIntExtra(EXTRA_STARTUP_PAGE_NUM, 0);
       viewPager.setCurrentItem(startupPage,
           false);
+      progressBar = (ProgressBar) findViewById(R.id.progressBar);
+      progressBar.setIndeterminate(true);
+      textViewProgress = (TextView) findViewById(R.id.textViewProgress);
+
+      startService(new Intent(this, AppProcessorService.class));
    }
 
    @Override protected void onResume() {
       super.onResume();
+      appsJobReceiver = new AppsJobBroadcastReceiver();
+      LocalBroadcastManager.getInstance(this)
+          .registerReceiver(appsJobReceiver, AppProcessorService.getBroadcastIntentFilter());
+   }
+
+   @Override protected void onPause() {
+      super.onPause();
+      LocalBroadcastManager.getInstance(this).unregisterReceiver(appsJobReceiver);
    }
 
    public void onBtnNextPage(View view) {
@@ -158,8 +164,6 @@ public class WelcomeActivity extends AppCompatActivity {
          oldDragPosition = 0;
          pageFlipper.start();
       }
-      /*if (viewPager.getCurrentItem() != 3)
-         viewPager.setCurrentItem(viewPager.getCurrentItem() + 1, true);*/
    }
 
    private void initFlipper() {

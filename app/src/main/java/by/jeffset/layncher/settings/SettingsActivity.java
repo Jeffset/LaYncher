@@ -3,7 +3,6 @@ package by.jeffset.layncher.settings;
 import android.app.Fragment;
 import android.content.ContentValues;
 import android.content.SharedPreferences;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
@@ -15,9 +14,11 @@ import android.widget.Toast;
 import by.jeffset.data.SearchContract;
 import by.jeffset.layncher.R;
 import by.jeffset.layncher.data.AppsContract;
-import by.jeffset.layncher.data.DbHelper;
 
 public class SettingsActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
+
+   public static final int NEED_RELAUNCH = -100;
+
    @Override protected void onCreate(@Nullable Bundle savedInstanceState) {
       SettingsWrapper wrapper = new SettingsWrapper(this);
       SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -29,7 +30,6 @@ public class SettingsActivity extends AppCompatActivity implements SharedPrefere
 
 
    public void onClearSearchHistory(View view) {
-      SQLiteDatabase database = new DbHelper(this).getWritableDatabase();
       int count = getContentResolver().delete(SearchContract.ALL_URI, null, null);
       //DbHelper.resetUriHistory(database);
       Toast.makeText(this, "Cleared " + count + " item(s)", Toast.LENGTH_SHORT).show();
@@ -43,8 +43,12 @@ public class SettingsActivity extends AppCompatActivity implements SharedPrefere
    }
 
    @Override public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-      if (key.equals(getString(R.string.pref_theme_key))) {
-         finish();
+      if (key.equals(getString(R.string.pref_theme_key)) ||
+          key.equals(getString(R.string.pref_layout_key)) ||
+          key.equals(getString(R.string.pref_show_faves_key))) {
+         setResult(NEED_RELAUNCH);
+         if (key.equals(getString(R.string.pref_theme_key)))
+            finish();
          /*overridePendingTransition(0, 0);
          startActivity(getIntent());
          overridePendingTransition(0, 0);*/

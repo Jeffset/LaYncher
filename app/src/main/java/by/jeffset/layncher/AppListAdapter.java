@@ -19,7 +19,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import by.jeffset.layncher.data.AppProcessor;
+import by.jeffset.layncher.data.AppProcessorService;
 import by.jeffset.layncher.data.AppsContract;
 
 public class AppListAdapter extends RecyclerViewCursorAdapter<AppListAdapter.AppViewHolder> {
@@ -97,7 +97,7 @@ public class AppListAdapter extends RecyclerViewCursorAdapter<AppListAdapter.App
          boolean isFavourite = cursor.getInt(isFavouriteColInd) != 0;
          String packageName = cursor.getString(packageNameColInd);
          String activityName = cursor.getString(activityNameColInd);
-         String iconFileName = AppProcessor.getIconFileName(packageName, activityName);
+         String iconFileName = AppProcessorService.getIconFileName(packageName, activityName);
          String label = cursor.getString(labelColInd);
          startView.setVisibility(isFavourite ? View.VISIBLE : View.INVISIBLE);
          iconView.setImageDrawable(dataFragment.loadIcon(iconFileName));
@@ -113,21 +113,29 @@ public class AppListAdapter extends RecyclerViewCursorAdapter<AppListAdapter.App
       labelColInd = cursor.getColumnIndex(AppsContract.App.LABEL);
       isFavouriteColInd = cursor.getColumnIndex(AppsContract.App.IS_FAVOURITE);
       this.activity = activity;
+      obtainDataFragment();
    }
 
    @Override public void onResume() {
+      obtainDataFragment();
       super.onResume();
-      FragmentManager fm = activity.getFragmentManager();
-      dataFragment = (IconDataFragment) fm.findFragmentByTag(IconDataFragment.TAG);
+   }
+
+   private void obtainDataFragment() {
       if (dataFragment == null) {
-         dataFragment = new IconDataFragment();
-         fm.beginTransaction()
-             .add(dataFragment, IconDataFragment.TAG)
-             .commit();
+         FragmentManager fm = activity.getFragmentManager();
+         dataFragment = (IconDataFragment) fm.findFragmentByTag(IconDataFragment.TAG);
+         if (dataFragment == null) {
+            dataFragment = new IconDataFragment();
+            fm.beginTransaction()
+                .add(dataFragment, IconDataFragment.TAG)
+                .commit();
+         }
       }
    }
 
    @Override public void onBindViewHolder(AppViewHolder holder, Cursor cursor) {
+      obtainDataFragment();
       holder.bind(cursor, dataFragment);
    }
 

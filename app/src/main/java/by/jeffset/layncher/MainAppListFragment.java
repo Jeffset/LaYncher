@@ -5,9 +5,12 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.Resources;
 import android.database.Cursor;
+import android.graphics.Canvas;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -26,13 +29,29 @@ public class MainAppListFragment extends AppListFragment {
    private RecyclerView newAppsStrip;
    private RecyclerView popularAppsStrip;
 
-   private int columnCount;
+   private AppBarLayout appBarLayout;
+
    private AppListAdapter popularAppsAdapter;
    private AppListAdapter newAppsAdapter;
 
-   //InstalledApp contextApp;
-
    //===================================================
+
+   private class ListShadeDecor extends RecyclerView.ItemDecoration {
+      void setOpacity(int opacity) {
+         if (this.opacity == opacity)
+            return;
+         this.opacity = opacity;
+         recyclerView.invalidate();
+      }
+
+      private int opacity = 0;
+
+      @Override public void onDrawOver(Canvas c, RecyclerView parent, RecyclerView.State state) {
+         super.onDrawOver(c, parent, state);
+         if (opacity != 0)
+            c.drawARGB(opacity, 0, 0, 0);
+      }
+   }
 
    @NonNull public static MainAppListFragment newInstance() {
       return new MainAppListFragment();
@@ -54,7 +73,7 @@ public class MainAppListFragment extends AppListFragment {
 
       Activity activity = getActivity();
 
-      columnCount = obtainColumnCount(activity);
+      int columnCount = obtainColumnCount(activity);
 
       ContentResolver contentResolver = activity.getContentResolver();
 
@@ -75,6 +94,15 @@ public class MainAppListFragment extends AppListFragment {
 
 
       recyclerView.setLayoutManager(new GridLayoutManager(activity, columnCount));
+
+      ListShadeDecor itemDecoration = new ListShadeDecor();
+      recyclerView.addItemDecoration(itemDecoration);
+
+      appBarLayout.addOnOffsetChangedListener((layout, verticalOffset) -> {
+         int height = layout.getHeight() / 2;
+         itemDecoration.setOpacity((int) (Math.max(0, height + verticalOffset) * 180.0 / height));
+      });
+
       Cursor query = contentResolver.query(AppsContract.APPS_URI, AppsContract.App.ALL,
           null, null, null);
       launcherAdapter = new AppListAdapter(activity, query);
@@ -92,15 +120,19 @@ public class MainAppListFragment extends AppListFragment {
       recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
       newAppsStrip = (RecyclerView) view.findViewById(R.id.newAppsBarStrip);
       popularAppsStrip = (RecyclerView) view.findViewById(R.id.popularAppsStrip);
+      appBarLayout = (AppBarLayout) view.findViewById(R.id.appsLayoutContainer);
+
       return view;
    }
 
 
    @Override public void onResume() {
       super.onResume();
-      launcherAdapter.onResume();
-      newAppsAdapter.onResume();
-      popularAppsAdapter.onResume();
+      new Handler().postDelayed(() -> {
+         launcherAdapter.onResume();
+         newAppsAdapter.onResume();
+         popularAppsAdapter.onResume();
+      }, 200);
    }
 
    @Override public void onPause() {
