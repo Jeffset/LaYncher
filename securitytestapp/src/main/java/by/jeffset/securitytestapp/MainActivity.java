@@ -1,7 +1,11 @@
 package by.jeffset.securitytestapp;
 
+import android.content.ComponentName;
 import android.content.ContentValues;
+import android.content.pm.PackageManager;
+import android.content.pm.ProviderInfo;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -99,6 +103,27 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "inserted", Toast.LENGTH_SHORT).show();
       } catch (SecurityException e) {
          displayError(e);
+      }
+   }
+
+   public void testUandexDsik(View view) {
+      Cursor query = null;
+      try {
+         ProviderInfo info = getPackageManager().getProviderInfo(
+             new ComponentName("ru.yandex.disk", "com.yandex.disk.sync.PhotoSyncProvider"),
+             PackageManager.GET_META_DATA);
+         Uri uri = Uri.parse("content://com.yandex.disk.sync.photo/" + editText.getText());
+         String type = getContentResolver().getType(uri);
+         System.out.println("type = " + type);
+         query = getContentResolver().query(uri,
+             null, null, null, null);
+         System.out.println("query.getCount() = " + query.getCount());
+      } catch (UnsupportedOperationException e) {
+         Toast.makeText(this, "unsupported", Toast.LENGTH_SHORT).show();
+         e.printStackTrace();
+      } catch (PackageManager.NameNotFoundException e) {
+         Toast.makeText(this, "not found", Toast.LENGTH_SHORT).show();
+         e.printStackTrace();
       }
    }
 }
