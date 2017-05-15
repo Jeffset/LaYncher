@@ -254,7 +254,7 @@ public class AppProcessorService extends Service {
          //e.printStackTrace();
          iconOriginal = ResourcesCompat.getDrawable(getResources(), R.drawable.icon5, null);
       }
-      Bitmap icon = decorateIcon(iconOriginal);
+      Bitmap icon = decorateIcon(iconOriginal, getResources(), true);
       File savedIcon = new File(getFilesDir(), name);
       try {
          icon.compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(savedIcon));
@@ -269,9 +269,8 @@ public class AppProcessorService extends Service {
 
    private static Bitmap mask = null;
 
-   @NonNull private Bitmap decorateIcon(@NonNull Drawable original) {
-      Resources res = getResources();
-      int size = res.getDimensionPixelSize(R.dimen.iconSize);
+   @NonNull public static Bitmap decorateIcon(@NonNull Drawable original, Resources resources, boolean usePalette) {
+      int size = resources.getDimensionPixelSize(R.dimen.iconSize);
       Path clippingPath = new Path();
       RectF clip = new RectF(0.f, 0.f, size, size);
       clippingPath.addRoundRect(clip, size / 4.f, size / 4.f, Path.Direction.CW);
@@ -289,7 +288,7 @@ public class AppProcessorService extends Service {
       Bitmap output = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
       Canvas canvas = new Canvas(output);
       int backgroundFill = Color.BLACK;
-      if (original instanceof BitmapDrawable) {
+      if (usePalette && original instanceof BitmapDrawable) {
          Palette palette = Palette.from(((BitmapDrawable) original).getBitmap()).generate();
          backgroundFill = palette.getDominantColor(Color.GREEN);
       }

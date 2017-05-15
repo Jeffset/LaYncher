@@ -22,12 +22,12 @@ public interface SearchContract {
       String TIME = "time";
    }
 
-   String CREATE_URIS_SCRIPT =
+   String CREATE_SCRIPT =
        "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" +
 
            Search._ID + " INTEGER PRIMARY KEY, " +
            Search.TIME + " INT, " +
            Search.URI + " TEXT)";
 
-   String DROP_URIS_SCRIPT = "DROP TABLE IF EXISTS " + TABLE_NAME;
+   String DROP_SCRIPT = "DROP TABLE IF EXISTS " + TABLE_NAME;
 }

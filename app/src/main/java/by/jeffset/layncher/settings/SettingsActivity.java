@@ -14,6 +14,7 @@ import android.widget.Toast;
 import by.jeffset.data.SearchContract;
 import by.jeffset.layncher.R;
 import by.jeffset.layncher.data.AppsContract;
+import by.jeffset.layncher.data.PhonesContract;
 
 public class SettingsActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -38,8 +39,11 @@ public class SettingsActivity extends AppCompatActivity implements SharedPrefere
    public void onClearFavouriteApps(View view) {
       ContentValues values = new ContentValues();
       values.put(AppsContract.App.IS_FAVOURITE, false);
-      getContentResolver().update(AppsContract.APPS_URI, values, null, null);
-      Toast.makeText(this, "Cleared", Toast.LENGTH_SHORT).show();
+      int apps = getContentResolver().update(AppsContract.APPS_URI, values,
+          AppsContract.App.IS_FAVOURITE + " != 0", null);
+      int phones = getContentResolver().delete(PhonesContract.PHONES_URI, null, null);
+      Toast.makeText(this,
+          String.format("Cleared %d apps and %d phones", apps, phones), Toast.LENGTH_SHORT).show();
    }
 
    @Override public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
@@ -49,9 +53,6 @@ public class SettingsActivity extends AppCompatActivity implements SharedPrefere
          setResult(NEED_RELAUNCH);
          if (key.equals(getString(R.string.pref_theme_key)))
             finish();
-         /*overridePendingTransition(0, 0);
-         startActivity(getIntent());
-         overridePendingTransition(0, 0);*/
       }
    }
 

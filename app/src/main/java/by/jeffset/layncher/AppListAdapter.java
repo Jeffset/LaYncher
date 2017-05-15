@@ -1,11 +1,8 @@
 package by.jeffset.layncher;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.app.FragmentManager;
 import android.database.Cursor;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -14,10 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
 
 import by.jeffset.layncher.data.AppProcessorService;
 import by.jeffset.layncher.data.AppsContract;
@@ -37,25 +30,6 @@ public class AppListAdapter extends RecyclerViewCursorAdapter<AppListAdapter.App
       void onClick(String packageName, String activityName, int appId);
 
       boolean onLongClick(String packageName, int appId, Drawable icon, boolean isFavourite);
-   }
-
-   public static class IconDataFragment extends Fragment {
-      private static final String TAG = "by.jeffset.layncher.iconDataFragment";
-
-      private Map<String, Drawable> icons = new HashMap<>();
-
-      Drawable loadIcon(String name) {
-         if (icons.containsKey(name))
-            return icons.get(name);
-         File iconFile = new File(getActivity().getFilesDir(), name);
-         Drawable icon = new BitmapDrawable(BitmapFactory.decodeFile(iconFile.getAbsolutePath()));
-         icons.put(name, icon);
-         return icon;
-      }
-
-      public IconDataFragment() {
-         setRetainInstance(true);
-      }
    }
 
    class AppViewHolder extends RecyclerView.ViewHolder {

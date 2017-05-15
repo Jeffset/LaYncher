@@ -1,61 +1,67 @@
 <android.support.design.widget.CoordinatorLayout
    xmlns:android="http://schemas.android.com/apk/res/android"
    xmlns:app="http://schemas.android.com/apk/res-auto"
-   xmlns:tools="http://schemas.android.com/tools"
    android:layout_width="match_parent"
    android:layout_height="match_parent">
 
-   <LinearLayout
+   <android.support.v7.widget.CardView
       android:layout_width="match_parent"
       android:layout_height="match_parent"
-      android:orientation="vertical"
-      tools:activity="by.jeffset.layncher.FavouriteAppsFragment">
+      android:layout_margin="16dp"
+      app:cardBackgroundColor="?colorNewAppsStrip"
+      app:cardCornerRadius="5dp">
 
-      <TextView
+      <LinearLayout
          android:layout_width="match_parent"
-         android:layout_height="wrap_content"
-         android:layout_marginTop="16dp"
-         android:gravity="center"
-         android:text="Favourites screen"
-         android:textAppearance="?android:textAppearanceLarge"/>
+         android:layout_height="match_parent"
+         android:orientation="vertical">
 
-      <android.support.v7.widget.CardView
-         android:layout_width="match_parent"
-         android:layout_height="0dp"
-         android:layout_margin="16dp"
-         android:layout_weight="1"
-         app:cardBackgroundColor="?colorNewAppsStrip"
-         app:cardCornerRadius="5dp">
+         <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:gravity="center"
+            android:text="Favourites screen"
+            android:textAppearance="?android:textAppearanceSmall"/>
 
          <android.support.v7.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_margin="6dp"/>
-      </android.support.v7.widget.CardView>
+            android:layout_height="0dp"
+            android:layout_margin="6dp"
+            android:layout_weight="1.5"/>
 
-      <AutoCompleteTextView
-         android:id="@+id/autoCompleteTextView"
-         android:layout_width="match_parent"
-         android:layout_height="wrap_content"
-         android:layout_marginBottom="6dp"
-         android:layout_marginEnd="6dp"
-         android:layout_marginStart="6dp"
-         android:hint="Enter some uri..."
-         android:imeOptions="actionDone"
-         android:inputType="textUri"
-         android:maxLines="1"/>
+         <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerViewContacts"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_margin="6dp"
+            android:layout_weight="1"/>
 
-   </LinearLayout>
+         <AutoCompleteTextView
+            android:id="@+id/autoCompleteTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"
+            android:layout_marginEnd="6dp"
+            android:layout_marginStart="6dp"
+            android:hint="Enter some uri..."
+            android:imeOptions="actionDone"
+            android:inputType="textUri"
+            android:maxLines="1"/>
+      </LinearLayout>
+   </android.support.v7.widget.CardView>
+
    <android.support.design.widget.FloatingActionButton
-      android:layout_width="50dp"
-      android:layout_height="50dp"
-      app:elevation="20dp"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_margin="5dp"
       android:onClick="addContact"
-      android:layout_margin="20dp"
-      android:src="@android:drawable/stat_sys_phone_call"
-      app:layout_anchor="@id/recyclerView"
+      app:elevation="10dp"
+      app:fabSize="normal"
+      app:layout_anchor="@id/recyclerViewContacts"
       app:layout_anchorGravity="bottom|end"
+      app:srcCompat="@drawable/ic_person_add_white_36px"
       />
 </android.support.design.widget.CoordinatorLayout>
 

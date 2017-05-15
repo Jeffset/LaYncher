@@ -4,6 +4,7 @@
 
    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
    <uses-permission android:name="android.permission.CALL_PHONE"/>
+
    <uses-permission android:name="android.permission.READ_CONTACTS"/>
 
    <permission android:name="by.jeffset.layncher.security.SEARCH_URI_MODIFY_ALL"/>
@@ -43,7 +44,7 @@
       </activity>
 
       <provider
-         android:name=".data.InternalContentProvider"
+         android:name=".data.LaYContentProvider"
          android:authorities="by.jeffset.layncher.private"
          android:enabled="true"
          android:exported="false">

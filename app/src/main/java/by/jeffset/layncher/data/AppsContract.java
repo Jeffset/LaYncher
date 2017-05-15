@@ -6,10 +6,10 @@ import android.provider.BaseColumns;
 
 public interface AppsContract {
    String AUTHORITY = "by.jeffset.layncher.private";
-   String RESULTS_PATH = "apps";
+   String APPS_PATH = "apps";
 
    Uri AUTHORITY_URI = Uri.parse("content://" + AUTHORITY);
-   Uri APPS_URI = Uri.withAppendedPath(AUTHORITY_URI, RESULTS_PATH);
+   Uri APPS_URI = Uri.withAppendedPath(AUTHORITY_URI, APPS_PATH);
 
    String TABLE_NAME = "apps";
 
@@ -35,7 +35,7 @@ public interface AppsContract {
       };
    }
 
-   String CREATE_APPS_SCRIPT =
+   String CREATE_SCRIPT =
        "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" +
            App._ID + " INTEGER PRIMARY KEY, " +
            App.PACKAGE_NAME + " TEXT, " +
@@ -45,5 +45,5 @@ public interface AppsContract {
            App.USAGE_TIME + " INTEGER, " +
            App.IS_FAVOURITE + " INTEGER, " +
            App.SOURCE_DIR + " TEXT)";
-   String DROP_APPS_SCRIPT = "DROP TABLE IF EXISTS " + TABLE_NAME;
+   String DROP_SCRIPT = "DROP TABLE IF EXISTS " + TABLE_NAME;
 }
