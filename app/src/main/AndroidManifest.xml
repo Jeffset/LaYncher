@@ -28,7 +28,7 @@
       </activity>
       <activity
          android:name=".MainActivity"
-         android:launchMode="singleInstance">
+         android:launchMode="singleTask">
          <intent-filter>
             <action android:name="android.intent.action.MAIN"/>
             <data android:name="android.content.Intent.FLAG_ACTIVITY_NO_ANIMATION"/>

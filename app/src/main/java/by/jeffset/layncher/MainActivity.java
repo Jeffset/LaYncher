@@ -49,9 +49,7 @@ public class MainActivity extends AppCompatActivity {
          case PHONE_REQ: {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED &&
                 grantResults[1] == PackageManager.PERMISSION_GRANTED) {
-               Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
-               intent.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE);
-               startActivityForResult(intent, PHONE_REQ);
+               launchNumberPicker();
             }
             break;
          }
@@ -67,7 +65,11 @@ public class MainActivity extends AppCompatActivity {
          return;
       }
 
-      Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+      launchNumberPicker();
+   }
+
+   private void launchNumberPicker() {
+      Intent intent = new Intent(Intent.ACTION_PICK);
       intent.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE);
       startActivityForResult(intent, PHONE_REQ);
    }
