@@ -25,6 +25,9 @@
          android:layout_height="wrap_content"
          android:layout_gravity="center"
          android:ellipsize="end"
+         android:textColor="#FFF"
+         android:shadowRadius="20"
+         android:shadowColor="@android:color/black"
          android:gravity="center"
          android:maxLines="1"
          android:text="0x12FF"/>

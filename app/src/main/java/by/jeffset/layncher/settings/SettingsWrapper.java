@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.StyleRes;
 
 import by.jeffset.layncher.R;
@@ -35,13 +36,18 @@ public class SettingsWrapper {
           "10"));
    }
 
+   public void setPhotoFetcher(String fetcher) {
+      prefs.edit().putString(res.getString(R.string.pref_photo_fetcher), fetcher).apply();
+   }
+
+   public @Nullable String getPhotoFetcher() {
+      return prefs.getString(res.getString(R.string.pref_photo_fetcher), null);
+   }
+
    public boolean isShowFaves() {
       return prefs.getBoolean(res.getString(R.string.pref_show_faves_key), true);
    }
 
-   public boolean wasInitDone() {return prefs.getBoolean("layncher.jobDone", false);}
-
-   public void setInitDone(boolean value) {prefs.edit().putBoolean("layncher.jobDone", value).apply();}
 
    public boolean wasWelcomeShowed() {
       return prefs.getBoolean(WelcomeActivity.PREFS_WELCOME_SHOWED, false);

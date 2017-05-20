@@ -68,6 +68,7 @@ public class AppProcessorService extends Service {
    private ServiceHandler handler;
 
    private int currentOperation = NO_JOB;
+   private Looper threadLooper;
 
    private static class ExistingEntry {
       int id;
@@ -202,7 +203,13 @@ public class AppProcessorService extends Service {
       HandlerThread thread = new HandlerThread("ServiceStartArguments",
           Process.THREAD_PRIORITY_MORE_FAVORABLE);
       thread.start();
-      handler = new ServiceHandler(thread.getLooper());
+      threadLooper = thread.getLooper();
+      handler = new ServiceHandler(threadLooper);
+   }
+
+   @Override public void onDestroy() {
+      super.onDestroy();
+      threadLooper.quit();
    }
 
    @Override

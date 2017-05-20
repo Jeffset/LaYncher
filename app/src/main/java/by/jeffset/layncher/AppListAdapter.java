@@ -15,7 +15,8 @@ import android.widget.TextView;
 import by.jeffset.layncher.data.AppProcessorService;
 import by.jeffset.layncher.data.AppsContract;
 
-public class AppListAdapter extends RecyclerViewCursorAdapter<AppListAdapter.AppViewHolder> {
+public class AppListAdapter
+    extends RecyclerViewCursorAdapter<AppListAdapter.AppViewHolder>  {
 
    private int packageNameColInd;
    private int activityNameColInd;

@@ -21,7 +21,7 @@ import by.jeffset.layncher.data.AppsContract;
 import by.jeffset.layncher.settings.SettingsWrapper;
 
 
-public class MainAppListFragment extends AppListFragment {
+public class MainAppListFragment extends AppListFragment  {
 
    AppListAdapter launcherAdapter;
    RecyclerView recyclerView;

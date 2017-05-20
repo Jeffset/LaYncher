@@ -21,4 +21,13 @@
       <item>2</item>
    </string-array>
 
+
+   <string name="unsplash_it">Unsplash.it</string>
+   <string name="yandex_fotki">Yandex Fotki</string>
+
+   <string-array name="photo_fetchers">
+      <item>@string/unsplash_it</item>
+      <item>@string/yandex_fotki</item>
+   </string-array>
+
 </resources>

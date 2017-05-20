@@ -36,4 +36,14 @@
       android:key="@string/pref_layout_key"
       android:title="Apps layout"/>
 
+   <ListPreference
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:defaultValue="@string/unsplash_it"
+      android:entries="@array/photo_fetchers"
+      android:entryValues="@array/photo_fetchers"
+      android:key="@string/pref_photo_fetcher"
+      android:title="Background image provider"
+      />
+
 </PreferenceScreen>

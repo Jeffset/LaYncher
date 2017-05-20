@@ -3,10 +3,13 @@ package by.jeffset.layncher;
 import android.Manifest;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -19,8 +22,10 @@ import android.support.annotation.NonNull;
 import android.support.v13.app.ActivityCompat;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 
 import java.io.ByteArrayInputStream;
@@ -29,10 +34,11 @@ import java.io.InputStream;
 
 import by.jeffset.layncher.data.AppProcessorService;
 import by.jeffset.layncher.data.PhonesContract;
+import by.jeffset.layncher.net.PhotoLoadingService;
 import by.jeffset.layncher.settings.SettingsActivity;
 import by.jeffset.layncher.settings.SettingsWrapper;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity{
    public static final String TAG = "LaYncher.AppDataHelper";
    public static final int SETTINGS_REQ = 228;
    public static final int PHONE_REQ = 740;
@@ -41,6 +47,20 @@ public class MainActivity extends AppCompatActivity {
        ContactsContract.CommonDataKinds.Phone.NUMBER,
        ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
    };
+
+
+   private final class ImageReadyReceiver extends BroadcastReceiver {
+      @Override public void onReceive(Context context, Intent intent) {
+         switch (intent.getAction()) {
+            case PhotoLoadingService.IMAGE_READY_BROADCAST:
+               Log.i(TAG, "onReceive: imageReady");
+               PhotoLoadingService.setBackgroundImageAsync(MainActivity.this);
+               break;
+         }
+      }
+   }
+
+   ImageReadyReceiver receiver;
 
    @Override public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                                     @NonNull int[] grantResults) {
@@ -178,6 +198,24 @@ public class MainActivity extends AppCompatActivity {
       }
    }
 
+   @Override protected void onResume() {
+      super.onResume();
+      receiver = new ImageReadyReceiver();
+      LocalBroadcastManager.getInstance(this).registerReceiver(receiver,
+          new IntentFilter(PhotoLoadingService.IMAGE_READY_BROADCAST));
+      PhotoLoadingService.startCycledUpdate(this);
+   }
+
+   @Override protected void onPause() {
+      super.onPause();
+      LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
+   }
+
+   @Override protected void onDestroy() {
+      super.onDestroy();
+      PhotoLoadingService.stopCycledUpdate(this);
+   }
+
    @Override
    protected void onCreate(Bundle savedInstanceState) {
       startService(new Intent(this, AppProcessorService.class));
@@ -196,5 +234,7 @@ public class MainActivity extends AppCompatActivity {
       }
       pager.setPageTransformer(false, new PageAnimator());
       pager.setCurrentItem(0);
+
+      PhotoLoadingService.setBackgroundImageAsync(this);
    }
 }
