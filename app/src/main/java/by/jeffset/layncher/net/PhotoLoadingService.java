@@ -111,7 +111,7 @@ public class PhotoLoadingService extends Service {
                } finally {
                   Log.i(TAG, "job: stop");
 
-                  stopSelf(startId);
+                  //stopSelf(startId);
                }
             });
             break;
