@@ -5,7 +5,6 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.Resources;
 import android.database.Cursor;
-import android.graphics.Canvas;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -35,23 +34,6 @@ public class MainAppListFragment extends AppListFragment  {
    private AppListAdapter newAppsAdapter;
 
    //===================================================
-
-   private class ListShadeDecor extends RecyclerView.ItemDecoration {
-      void setOpacity(int opacity) {
-         if (this.opacity == opacity)
-            return;
-         this.opacity = opacity;
-         recyclerView.invalidate();
-      }
-
-      private int opacity = 0;
-
-      @Override public void onDrawOver(Canvas c, RecyclerView parent, RecyclerView.State state) {
-         super.onDrawOver(c, parent, state);
-         if (opacity != 0)
-            c.drawARGB(opacity, 0, 0, 0);
-      }
-   }
 
    @NonNull public static MainAppListFragment newInstance() {
       return new MainAppListFragment();
@@ -94,14 +76,6 @@ public class MainAppListFragment extends AppListFragment  {
 
 
       recyclerView.setLayoutManager(new GridLayoutManager(activity, columnCount));
-
-      ListShadeDecor itemDecoration = new ListShadeDecor();
-      recyclerView.addItemDecoration(itemDecoration);
-
-      appBarLayout.addOnOffsetChangedListener((layout, verticalOffset) -> {
-         int height = layout.getHeight() / 2;
-         itemDecoration.setOpacity((int) (Math.max(0, height + verticalOffset) * 180.0 / height));
-      });
 
       Cursor query = contentResolver.query(AppsContract.APPS_URI, AppsContract.App.ALL,
           null, null, null);

@@ -15,7 +15,6 @@ import by.jeffset.data.SearchContract;
 import by.jeffset.layncher.R;
 import by.jeffset.layncher.data.AppsContract;
 import by.jeffset.layncher.data.PhonesContract;
-import by.jeffset.layncher.net.PhotoLoadingService;
 
 public class SettingsActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -28,7 +27,7 @@ public class SettingsActivity extends AppCompatActivity implements SharedPrefere
       setTheme(wrapper.getThemeId());
       super.onCreate(savedInstanceState);
       setContentView(R.layout.activity_settings);
-      PhotoLoadingService.setBackgroundImageAsync(this);
+      //PhotoLoadingService.setBackgroundImageAsync(this);
    }
 
 

@@ -66,6 +66,10 @@ public class SettingsWrapper {
       prefs.edit().putString(res.getString(R.string.pref_layout_key), mode).apply();
    }
 
+   public int getImageUpdatePeriod() {
+      return Integer.valueOf(prefs.getString(res.getString(R.string.pref_update_photo_delay), null));
+   }
+
    public void setHistoryLength(int length) {
       prefs.edit().putString(res.getString(R.string.pref_history_len_key), String.valueOf(length)).apply();
    }

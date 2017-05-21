@@ -27,6 +27,9 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageSwitcher;
+import android.widget.ImageView;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -38,7 +41,7 @@ import by.jeffset.layncher.net.PhotoLoadingService;
 import by.jeffset.layncher.settings.SettingsActivity;
 import by.jeffset.layncher.settings.SettingsWrapper;
 
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends AppCompatActivity {
    public static final String TAG = "LaYncher.AppDataHelper";
    public static final int SETTINGS_REQ = 228;
    public static final int PHONE_REQ = 740;
@@ -47,6 +50,11 @@ public class MainActivity extends AppCompatActivity{
        ContactsContract.CommonDataKinds.Phone.NUMBER,
        ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
    };
+   private ImageSwitcher background;
+
+   public void updateImageNow(View view) {
+      PhotoLoadingService.startUpdateNow(this);
+   }
 
 
    private final class ImageReadyReceiver extends BroadcastReceiver {
@@ -54,7 +62,7 @@ public class MainActivity extends AppCompatActivity{
          switch (intent.getAction()) {
             case PhotoLoadingService.IMAGE_READY_BROADCAST:
                Log.i(TAG, "onReceive: imageReady");
-               PhotoLoadingService.setBackgroundImageAsync(MainActivity.this);
+               PhotoLoadingService.setBackgroundImageAsync(MainActivity.this, background);
                break;
          }
       }
@@ -209,11 +217,12 @@ public class MainActivity extends AppCompatActivity{
    @Override protected void onPause() {
       super.onPause();
       LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
+      PhotoLoadingService.stopCycledUpdate(this);
    }
 
    @Override protected void onDestroy() {
       super.onDestroy();
-      PhotoLoadingService.stopCycledUpdate(this);
+      //PhotoLoadingService.stopCycledUpdate(this);
    }
 
    @Override
@@ -224,6 +233,17 @@ public class MainActivity extends AppCompatActivity{
       super.onCreate(savedInstanceState);
       setContentView(R.layout.activity_main);
 
+      background = (ImageSwitcher) findViewById(android.R.id.background);
+      background.setFactory(() -> {
+         ImageView imageView = new ImageView(MainActivity.this);
+         imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+
+         ViewGroup.LayoutParams params = new ImageSwitcher.LayoutParams(
+             ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+
+         imageView.setLayoutParams(params);
+         return imageView;
+      });
       ViewPager pager = (ViewPager) findViewById(R.id.viewPager);
       if (settingsWrapper.isShowFaves()) {
          PagerAdapterWithFaves adapter = new PagerAdapterWithFaves(getFragmentManager());
@@ -235,6 +255,7 @@ public class MainActivity extends AppCompatActivity{
       pager.setPageTransformer(false, new PageAnimator());
       pager.setCurrentItem(0);
 
-      PhotoLoadingService.setBackgroundImageAsync(this);
+      PhotoLoadingService.setBackgroundImageAsync(this, background);
+      //PhotoLoadingService.startCycledUpdate(this);
    }
 }

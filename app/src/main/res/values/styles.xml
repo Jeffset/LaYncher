@@ -1,6 +1,7 @@
 <resources>
 
    <declare-styleable name="Theme">
+      <attr name="colorFavouriteAppsPane" format="color"/>
       <attr name="colorNewAppsStrip" format="color"/>
       <attr name="colorRecentAppsStrip" format="color"/>
       <attr name="colorIndicatorSelected" format="color"/>
@@ -27,6 +28,7 @@
       <item name="colorIndicatorSelected">@color/colorIndicatorSelected.Light</item>
       <item name="colorIndicatorInactive">@color/colorIndicatorInactive.Light</item>
       <item name="colorFavourite">@color/colorFavourite.Light</item>
+      <item name="colorFavouriteAppsPane">@color/colorFavouriteAppsPane.Light</item>
    </style>
 
    <style name="AppTheme.Dark" parent="Theme.AppCompat.NoActionBar">
@@ -39,6 +41,8 @@
       <item name="colorIndicatorSelected">@color/colorIndicatorSelected.Dark</item>
       <item name="colorIndicatorInactive">@color/colorIndicatorInactive.Dark</item>
       <item name="colorFavourite">@color/colorFavourite.Dark</item>
+      <item name="colorFavouriteAppsPane">@color/colorFavouriteAppsPane.Dark</item>
+
    </style>
 
 

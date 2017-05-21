@@ -39,7 +39,7 @@ final class PhotoFetcherFactory {
       if (fetcherName.equals(context.getString(R.string.unsplash_it))) {
          fetcher = new UnsplashItPhotoFetcher(metrics.widthPixels, metrics.heightPixels);
       } else if (fetcherName.equals(context.getString(R.string.yandex_fotki)))
-         fetcher = new UnsplashItPhotoFetcher(metrics.widthPixels, metrics.heightPixels);
+         fetcher = new YandexFotkiPhotoFetcher();
       else
          throw new IllegalStateException();
 

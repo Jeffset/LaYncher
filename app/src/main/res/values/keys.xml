@@ -8,5 +8,6 @@
    <string name="pref_show_faves_key">layncher.show_faves</string>
    <string name="pref_history_len_key">layncher.history_len</string>
    <string name="pref_photo_fetcher">layncher.photo_fetcher</string>
+   <string name="pref_update_photo_delay">layncher.photo_update_delay</string>
    <!--===========================================-->
 </resources>

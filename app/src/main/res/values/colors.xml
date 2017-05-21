@@ -11,6 +11,7 @@
    <color name="colorIndicatorInactive.Light">@color/colorPrimaryDark</color>
    <color name="colorRecentAppStrip.Light">#c0ca33</color>
    <color name="colorFavourite.Light">#ffea00</color>
+   <color name="colorFavouriteAppsPane.Light">#BB4caf50</color>
    <!-- Dark -->
    <color name="colorNewAppStrip.Dark">@color/colorPrimaryDark</color>
    <color name="colorIndicatorSelected.Dark">@color/colorAccent</color>
@@ -18,4 +19,6 @@
    <color name="colorRecentAppStrip.Dark">#1b5e20</color>
    <color name="colorFavourite.Dark">#ffea00</color>
    <color name="windowBackground.Dark">#212121</color>
+   <color name="colorFavouriteAppsPane.Dark">#BB33691E</color>
+
 </resources>

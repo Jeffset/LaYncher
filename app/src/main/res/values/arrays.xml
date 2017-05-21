@@ -25,9 +25,32 @@
    <string name="unsplash_it">Unsplash.it</string>
    <string name="yandex_fotki">Yandex Fotki</string>
 
+   <string name="delay10sec">10 seconds (debug)</string>
+   <string name="delay15min">15 minutes</string>
+   <string name="delay1hour">1 hour</string>
+   <string name="delay8hours">8 hours</string>
+   <string name="delay1day">once per day</string>
+
    <string-array name="photo_fetchers">
       <item>@string/unsplash_it</item>
       <item>@string/yandex_fotki</item>
+   </string-array>
+
+   <string-array name="update_delays_display">
+      <item>@string/delay10sec</item>
+      <item>@string/delay15min</item>
+      <item>@string/delay1hour</item>
+      <item>@string/delay8hours</item>
+      <item>@string/delay1day</item>
+   </string-array>
+
+   <string name="default_image_update">900</string>
+   <string-array name="update_delays_values">
+      <item>10</item>
+      <item>@string/default_image_update</item>
+      <item>3600</item>
+      <item>28800</item>
+      <item>86400</item>
    </string-array>
 
 </resources>

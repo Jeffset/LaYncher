@@ -19,8 +19,9 @@ final class UnsplashItPhotoFetcher extends PhotoFetcher {
    private int imageId = 10;
 
    UnsplashItPhotoFetcher(int width, int height) {
-      this.width = (int) (width * 0.6);
-      this.height = (int) (height * 0.6);
+      int m = Math.max(width, height);
+      this.width = m;
+      this.height = m;
    }
 
    @Override void initFetcher() throws IOException {
