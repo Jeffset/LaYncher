@@ -31,7 +31,7 @@ public class YandexFotkiPhotoFetcher extends PhotoFetcher {
    @Override void initFetcher() throws IOException {
       index = 0;
       entries.clear();
-      URLConnection connection = new URL("http://api-fotki.yandex.ru/api/podhistory/?limit=50").openConnection();
+      URLConnection connection = new URL("http://api-fotki.yandex.ru/api/podhistory/?limit=100").openConnection();
       XmlPullParser parser = Xml.newPullParser();
       try {
          parser.setInput(new InputStreamReader(connection.getInputStream()));

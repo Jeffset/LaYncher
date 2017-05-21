@@ -21,7 +21,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
             android:gravity="center"
-            android:text="Favourites screen"
+            android:text="@string/favourites_screen"
             android:textAppearance="?android:textAppearanceSmall"/>
 
          <android.support.v7.widget.RecyclerView
@@ -45,7 +45,7 @@
             android:layout_marginBottom="6dp"
             android:layout_marginEnd="6dp"
             android:layout_marginStart="6dp"
-            android:hint="Enter some uri..."
+            android:hint="@string/hint_enter_some_uri"
             android:imeOptions="actionDone"
             android:inputType="textUri"
             android:maxLines="1"/>

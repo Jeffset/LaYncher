@@ -9,7 +9,6 @@ import android.view.WindowManager;
 import java.util.Map;
 import java.util.TreeMap;
 
-import by.jeffset.layncher.R;
 import by.jeffset.layncher.settings.SettingsWrapper;
 
 final class PhotoFetcherFactory {
@@ -36,12 +35,16 @@ final class PhotoFetcherFactory {
 
       PhotoFetcher fetcher;
 
-      if (fetcherName.equals(context.getString(R.string.unsplash_it))) {
-         fetcher = new UnsplashItPhotoFetcher(metrics.widthPixels, metrics.heightPixels);
-      } else if (fetcherName.equals(context.getString(R.string.yandex_fotki)))
-         fetcher = new YandexFotkiPhotoFetcher();
-      else
-         throw new IllegalStateException();
+      switch (fetcherName) {
+         case "unsplash.it":
+            fetcher = new UnsplashItPhotoFetcher(metrics.widthPixels, metrics.heightPixels);
+            break;
+         case "yandex.fotki":
+            fetcher = new YandexFotkiPhotoFetcher();
+            break;
+         default:
+            throw new IllegalStateException();
+      }
 
       fetchers.put(fetcherName, fetcher);
       return fetcher;

@@ -20,7 +20,14 @@
    <string name="menu_delete">Delete</string>
    <string name="menu_info">Info</string>
    <string name="app_info_header">application info:</string>
+   <string name="favourites_screen">Favourites screen</string>
+   <string name="setting_show_fav_apps_tab">Show favourite apps tab</string>
+   <string name="setting_history_length">Search history length</string>
+   <string name="setting_layncher_theme">LaYncher theme</string>
+   <string name="setting_apps_layout">Apps layout</string>
+   <string name="settings_image_provider">Background image provider</string>
+   <string name="settings_image_update_period">Background image update period</string>
+   <string name="hint_enter_some_uri">Enter some uri...</string>
 
    <!-- TODO: Remove or change this placeholder text -->
-   <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

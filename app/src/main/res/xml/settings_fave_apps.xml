@@ -6,7 +6,7 @@
       android:layout_height="wrap_content"
       android:defaultValue="true"
       android:key="@string/pref_show_faves_key"
-      android:title="Show favourite apps tab"/>
+      android:title="@string/setting_show_fav_apps_tab"/>
    <EditTextPreference
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
@@ -15,7 +15,7 @@
       android:key="@string/pref_history_len_key"
       android:selectAllOnFocus="true"
       android:singleLine="true"
-      android:title="Search history length"/>
+      android:title="@string/setting_history_length"/>
 
    <ListPreference
       android:layout_width="wrap_content"
@@ -24,7 +24,7 @@
       android:entries="@array/themes"
       android:entryValues="@array/themesId"
       android:key="@string/pref_theme_key"
-      android:title="LaYncher theme"/>
+      android:title="@string/setting_layncher_theme"/>
 
    <ListPreference
       android:layout_width="wrap_content"
@@ -33,22 +33,22 @@
       android:entries="@array/layout_modes"
       android:entryValues="@array/layout_modes_values"
       android:key="@string/pref_layout_key"
-      android:title="Apps layout"/>
+      android:title="@string/setting_apps_layout"/>
    <ListPreference
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:defaultValue="@string/unsplash_it"
+      android:defaultValue="unsplash.it"
       android:entries="@array/photo_fetchers"
-      android:entryValues="@array/photo_fetchers"
+      android:entryValues="@array/photo_fetchers_values"
       android:key="@string/pref_photo_fetcher"
-      android:title="Background image provider"
+      android:title="@string/settings_image_provider"
       />
    <ListPreference
       android:defaultValue="@string/default_image_update"
       android:entries="@array/update_delays_display"
       android:entryValues="@array/update_delays_values"
       android:key="@string/pref_update_photo_delay"
-      android:title="Background image update period"
+      android:title="@string/settings_image_update_period"
       />
 
 </PreferenceScreen>

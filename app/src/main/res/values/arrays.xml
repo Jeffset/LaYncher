@@ -36,6 +36,11 @@
       <item>@string/yandex_fotki</item>
    </string-array>
 
+   <string-array name="photo_fetchers_values">
+      <item>unsplash.it</item>
+      <item>yandex.fotki</item>
+   </string-array>
+
    <string-array name="update_delays_display">
       <item>@string/delay10sec</item>
       <item>@string/delay15min</item>
@@ -44,7 +49,7 @@
       <item>@string/delay1day</item>
    </string-array>
 
-   <string name="default_image_update">900</string>
+   <string name="default_image_update" translatable="false">900</string>
    <string-array name="update_delays_values">
       <item>10</item>
       <item>@string/default_image_update</item>

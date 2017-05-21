@@ -21,4 +21,19 @@
    <string name="menu_delete">Удалить</string>
    <string name="menu_info">Подробнее</string>
    <string name="app_info_header">информация:</string>
+   <string name="favourites_screen">Избранное</string>
+   <string name="unsplash_it">Unsplash.it</string>
+   <string name="yandex_fotki">Яндекс.Фотки</string>
+   <string name="setting_show_fav_apps_tab">Показывать избранное</string>
+   <string name="setting_history_length">Длина истории поиска</string>
+   <string name="setting_layncher_theme">Оформление</string>
+   <string name="setting_apps_layout">Макет</string>
+   <string name="settings_image_provider">Служба-поставщик изображений</string>
+   <string name="settings_image_update_period">Частота обновления фона</string>
+   <string name="delay10sec">10 секунд (отладка)</string>
+   <string name="delay15min">15 минут</string>
+   <string name="delay1hour">1 час</string>
+   <string name="delay8hours">8 часов</string>
+   <string name="delay1day">один раз в сутки</string>
+   <string name="hint_enter_some_uri">Введите URI для поиска...</string>
 </resources>

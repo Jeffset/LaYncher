@@ -25,7 +25,7 @@
             android:layout_marginRight="10dp"
             android:layout_marginTop="10dp"
             android:gravity="center"
-            android:text="Favourites screen"
+            android:text="@string/favourites_screen"
             android:textAppearance="?android:textAppearanceSmall"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
