@@ -44,42 +44,6 @@ public class PhotoLoadingService extends Service {
    private boolean runningCycle = false;
 
 
-   /*public static void startUpdateNow(@NonNull Context context) {
-      Intent intent = new Intent(context, PhotoLoadingService.class);
-      intent.setAction(UPDATE_NOW_ACTION);
-      context.startService(intent);
-   }
-
-   public static void startCycledUpdate(@NonNull Context context) {
-      Intent intent = new Intent(context, PhotoLoadingService.class);
-      intent.setAction(START_CYCLE_ACTION);
-      context.startService(intent);
-   }
-
-   public static void stopCycledUpdate(@NonNull Context context) {
-      Intent intent = new Intent(context, PhotoLoadingService.class);
-      intent.setAction(STOP_CYCLE_ACTION);
-      context.startService(intent);
-   }*/
-
-  /* public static void setBackgroundImageAsync(@NonNull Activity activity, @NonNull ImageSwitcher imageView) {
-      AsyncTask.execute(() -> {
-         File imageFile = new File(activity.getFilesDir(), BACKGROUND_PNG);
-         if (imageFile.exists()) {
-            try {
-               Bitmap bitmap = BitmapFactory.decodeStream(new FileInputStream(imageFile));
-               activity.runOnUiThread(() -> {
-                  BitmapDrawable drawable = new BitmapDrawable(bitmap);
-                  imageView.setImageDrawable(drawable);
-                  //drawable.setAlpha(128);
-                  //drawable.setGravity(Gravity.FILL);
-                  //activity.getWindow().setBackgroundDrawable(drawable);
-               });
-            } catch (FileNotFoundException ignored) {}
-         }
-      });
-   }*/
-
    public PhotoLoadingService() {
    }
 
@@ -152,7 +116,6 @@ public class PhotoLoadingService extends Service {
          } finally {
             startCycle();
             Log.i(TAG, "job: stop");
-            //stopSelf(startId);
          }
       });
    }

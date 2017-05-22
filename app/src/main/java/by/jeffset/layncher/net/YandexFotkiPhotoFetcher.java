@@ -7,7 +7,9 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -16,34 +18,43 @@ import java.util.List;
 import java.util.Map;
 
 public class YandexFotkiPhotoFetcher extends PhotoFetcher {
-   private static final String[] sizes = new String[]{
+   static final String[] sizes = new String[]{
        "XXL", "XL", "L", "M"
    };
 
-   private static class Entry {
+   URL url;
+
+   YandexFotkiPhotoFetcher() {
+      try {
+         url = new URL("http://api-fotki.yandex.ru/api/podhistory/?limit=100");
+      } catch (MalformedURLException ignored) {}
+   }
+
+   static class Entry {
       Map<String, URL> images = new HashMap<>();
    }
 
-   private List<Entry> entries = new ArrayList<>();
+   List<Entry> entries = new ArrayList<>();
 
    private int index;
 
    @Override void initFetcher() throws IOException {
       index = 0;
       entries.clear();
-      URLConnection connection = new URL("http://api-fotki.yandex.ru/api/podhistory/?limit=100").openConnection();
-      XmlPullParser parser = Xml.newPullParser();
+      URLConnection connection = url.openConnection();
       try {
-         parser.setInput(new InputStreamReader(connection.getInputStream()));
-         parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
-         parser.nextTag();
-         parseImageList(parser);
+         parseImageList(connection.getInputStream());
       } catch (XmlPullParserException e) {
          e.printStackTrace();
       }
    }
 
-   private void parseImageList(@NonNull XmlPullParser parser) throws IOException, XmlPullParserException {
+   void parseImageList(@NonNull InputStream inputStream) throws IOException, XmlPullParserException {
+      XmlPullParser parser = Xml.newPullParser();
+      parser.setInput(new InputStreamReader(inputStream));
+      parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
+      parser.nextTag();
+
       Entry currentEntry = null;
       while (parser.next() != XmlPullParser.END_DOCUMENT) {
          if (parser.getEventType() == XmlPullParser.START_TAG) {
