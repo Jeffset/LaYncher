@@ -3,13 +3,12 @@ package by.jeffset.layncher;
 import android.Manifest;
 import android.app.Fragment;
 import android.app.FragmentManager;
-import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -17,15 +16,15 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v13.app.ActivityCompat;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageSwitcher;
@@ -38,10 +37,11 @@ import java.io.InputStream;
 import by.jeffset.layncher.data.AppProcessorService;
 import by.jeffset.layncher.data.PhonesContract;
 import by.jeffset.layncher.net.PhotoLoadingService;
+import by.jeffset.layncher.net.PhotoLoadingService.PhotoServiceBinder;
 import by.jeffset.layncher.settings.SettingsActivity;
 import by.jeffset.layncher.settings.SettingsWrapper;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements PhotoLoadingService.ImageReadyListener {
    public static final String TAG = "LaYncher.AppDataHelper";
    public static final int SETTINGS_REQ = 228;
    public static final int PHONE_REQ = 740;
@@ -51,24 +51,30 @@ public class MainActivity extends AppCompatActivity {
        ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
    };
    private ImageSwitcher background;
+   private PhotoServiceBinder photoService;
+   private ServiceConnection serviceConnection;
 
    public void updateImageNow(View view) {
-      PhotoLoadingService.startUpdateNow(this);
+      //PhotoLoadingService.startUpdateNow(this);
+      photoService.updateNow();
    }
 
-
-   private final class ImageReadyReceiver extends BroadcastReceiver {
+/*   private final class ImageReadyReceiver extends BroadcastReceiver {
       @Override public void onReceive(Context context, Intent intent) {
          switch (intent.getAction()) {
             case PhotoLoadingService.IMAGE_READY_BROADCAST:
                Log.i(TAG, "onReceive: imageReady");
-               PhotoLoadingService.setBackgroundImageAsync(MainActivity.this, background);
+               photoService.loadCurrentImage(MainActivity.this, bitmap -> {
+                  if (bitmap != null)
+                     background.setImageDrawable(new BitmapDrawable(bitmap));
+               });
+               //PhotoLoadingService.setBackgroundImageAsync(MainActivity.this, background);
                break;
          }
       }
-   }
+   }*/
 
-   ImageReadyReceiver receiver;
+   //ImageReadyReceiver receiver;
 
    @Override public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                                     @NonNull int[] grantResults) {
@@ -164,6 +170,11 @@ public class MainActivity extends AppCompatActivity {
       startActivityForResult(new Intent(this, SettingsActivity.class), SETTINGS_REQ);
    }
 
+   @Override public void onImageReady(@Nullable Bitmap bitmap) {
+      if (bitmap != null)
+         runOnUiThread(() -> background.setImageDrawable(new BitmapDrawable(bitmap)));
+   }
+
    private class PagerAdapterWithFaves extends FragmentPagerAdapter {
       PagerAdapterWithFaves(FragmentManager fm) {
          super(fm);
@@ -208,20 +219,30 @@ public class MainActivity extends AppCompatActivity {
 
    @Override protected void onResume() {
       super.onResume();
-      receiver = new ImageReadyReceiver();
+      /*receiver = new ImageReadyReceiver();
       LocalBroadcastManager.getInstance(this).registerReceiver(receiver,
-          new IntentFilter(PhotoLoadingService.IMAGE_READY_BROADCAST));
-      PhotoLoadingService.startCycledUpdate(this);
+          new IntentFilter(PhotoLoadingService.IMAGE_READY_BROADCAST));*/
+      Intent intent = new Intent(this, PhotoLoadingService.class);
+      serviceConnection = new ServiceConnection() {
+         @Override public void onServiceConnected(ComponentName name, IBinder service) {
+            photoService = (PhotoServiceBinder) service;
+            photoService.addListener(MainActivity.this);
+            photoService.loadCurrentImage(MainActivity.this);
+         }
+
+         @Override public void onServiceDisconnected(ComponentName name) {
+            photoService = null;
+         }
+      };
+      bindService(intent, serviceConnection, BIND_AUTO_CREATE);
+      //PhotoLoadingService.startCycledUpdate(this);
    }
 
    @Override protected void onPause() {
       super.onPause();
-      LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
-      PhotoLoadingService.stopCycledUpdate(this);
-   }
-
-   @Override protected void onDestroy() {
-      super.onDestroy();
+      //LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
+      photoService.removeListener(this);
+      unbindService(serviceConnection);
       //PhotoLoadingService.stopCycledUpdate(this);
    }
 
@@ -255,7 +276,7 @@ public class MainActivity extends AppCompatActivity {
       pager.setPageTransformer(false, new PageAnimator());
       pager.setCurrentItem(0);
 
-      PhotoLoadingService.setBackgroundImageAsync(this, background);
+      //PhotoLoadingService.setBackgroundImageAsync(this, background);
       //PhotoLoadingService.startCycledUpdate(this);
    }
 }

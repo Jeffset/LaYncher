@@ -1,27 +1,23 @@
 package by.jeffset.layncher.net;
 
-import android.app.Activity;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.os.Binder;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
-import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.widget.ImageSwitcher;
+import android.widget.Toast;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -31,6 +27,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.List;
 
 import by.jeffset.layncher.settings.SettingsWrapper;
 
@@ -39,9 +37,6 @@ public class PhotoLoadingService extends Service {
 
    public static final String IMAGE_READY_BROADCAST = "by.jeffset.layncher.net.broadcast.IMAGE_READY";
 
-   static final String UPDATE_NOW_ACTION = "by.jeffset.layncher.net.action.UPDATE_NOW";
-   static final String START_CYCLE_ACTION = "by.jeffset.layncher.net.action.START_CYCLE";
-   static final String STOP_CYCLE_ACTION = "by.jeffset.layncher.net.action.STOP_CYCLE";
    private static final String BACKGROUND_PNG = "background.png";
    private static final String UPDATE_TIME_KEY = "by.layncher.lastImageUpdateTime";
 
@@ -49,8 +44,10 @@ public class PhotoLoadingService extends Service {
    private ServiceHandler handler;
    private PhotoFetcherFactory fetcherFactory;
    private boolean runningCycle = false;
+   private PhotoServiceBinder serviceBinder;
 
-   public static void startUpdateNow(@NonNull Context context) {
+
+   /*public static void startUpdateNow(@NonNull Context context) {
       Intent intent = new Intent(context, PhotoLoadingService.class);
       intent.setAction(UPDATE_NOW_ACTION);
       context.startService(intent);
@@ -66,9 +63,9 @@ public class PhotoLoadingService extends Service {
       Intent intent = new Intent(context, PhotoLoadingService.class);
       intent.setAction(STOP_CYCLE_ACTION);
       context.startService(intent);
-   }
+   }*/
 
-   public static void setBackgroundImageAsync(@NonNull Activity activity, @NonNull ImageSwitcher imageView) {
+  /* public static void setBackgroundImageAsync(@NonNull Activity activity, @NonNull ImageSwitcher imageView) {
       AsyncTask.execute(() -> {
          File imageFile = new File(activity.getFilesDir(), BACKGROUND_PNG);
          if (imageFile.exists()) {
@@ -84,7 +81,7 @@ public class PhotoLoadingService extends Service {
             } catch (FileNotFoundException ignored) {}
          }
       });
-   }
+   }*/
 
    public PhotoLoadingService() {
    }
@@ -101,56 +98,67 @@ public class PhotoLoadingService extends Service {
       handler = new ServiceHandler(looper);
    }
 
-   @Override public int onStartCommand(@Nullable final Intent intent, final int flags, final int startId) {
-      switch (intent.getAction()) {
-         case UPDATE_NOW_ACTION:
-            Log.i(TAG, "onStartCommand: update_now_action");
-            handler.post(() -> {
-               try {
-                  fetchImage();
-               } finally {
-                  Log.i(TAG, "job: stop");
-
-                  //stopSelf(startId);
-               }
-            });
-            break;
-         case START_CYCLE_ACTION:
-            if (runningCycle) break;
-            Log.i(TAG, "onStartCommand: start_cycle_action");
-            runningCycle = true;
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-            long updateTime = prefs.getLong(UPDATE_TIME_KEY, 0);
-            int seconds = new SettingsWrapper(PhotoLoadingService.this).getImageUpdatePeriod();
-            long targetUpdateTime = updateTime + seconds * 1000;
-            final long currentTime = System.currentTimeMillis();
-            long startDelay = targetUpdateTime <= currentTime ? 0 : targetUpdateTime - currentTime;
-            prefs.edit().putLong(UPDATE_TIME_KEY, currentTime).apply();
-            Log.i(TAG, "onStartCommand: delay = " + startDelay);
-            handler.postDelayed(new Runnable() {
-               @Override public void run() {
-                  fetchImage();
-                  prefs.edit().putLong(UPDATE_TIME_KEY, currentTime).apply();
-                  int period = new SettingsWrapper(PhotoLoadingService.this).getImageUpdatePeriod();
-                  handler.postDelayed(this, period * 1000);
-               }
-            }, startDelay);
-            break;
-         case STOP_CYCLE_ACTION:
-            runningCycle = false;
-            handler.removeCallbacksAndMessages(null);
-            stopSelf(startId);
-            break;
-      }
-
-      Message msg = handler.obtainMessage();
-      msg.arg1 = startId;
-      msg.obj = intent;
-      handler.sendMessage(msg);
-      return START_STICKY;
+   private void loadCurrentImage(ImageReadyListener listener) {
+      AsyncTask.execute(() -> {
+         File imageFile = new File(getFilesDir(), BACKGROUND_PNG);
+         if (imageFile.exists()) {
+            try {
+               Log.i(TAG, "loadCurrentImage: start");
+               Bitmap bitmap = BitmapFactory.decodeStream(new FileInputStream(imageFile));
+               Log.i(TAG, "loadCurrentImage: end");
+               listener.onImageReady(bitmap);
+            } catch (FileNotFoundException ignored) {
+               listener.onImageReady(null);
+            }
+         }
+      });
    }
 
-   private void fetchImage() {
+   private void stopCycle() {
+      Log.i(TAG, "stopCycle: called");
+      runningCycle = false;
+      handler.removeCallbacksAndMessages(null);
+   }
+
+   private void startCycle() {
+      if (runningCycle) return;
+      Log.i(TAG, "startCycle: start_cycle_action");
+      runningCycle = true;
+      SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+      long updateTime = prefs.getLong(UPDATE_TIME_KEY, 0);
+      int seconds = new SettingsWrapper(PhotoLoadingService.this).getImageUpdatePeriod();
+      long targetUpdateTime = updateTime + seconds * 1000;
+      final long currentTime = System.currentTimeMillis();
+      long startDelay = targetUpdateTime <= currentTime ? 0 : targetUpdateTime - currentTime;
+      prefs.edit().putLong(UPDATE_TIME_KEY, currentTime).apply();
+      Log.i(TAG, "startCycle: delay = " + startDelay);
+      handler.postDelayed(new Runnable() {
+         @Override public void run() {
+            fetchImage();
+            prefs.edit().putLong(UPDATE_TIME_KEY, currentTime).apply();
+            int period = new SettingsWrapper(PhotoLoadingService.this).getImageUpdatePeriod();
+            handler.postDelayed(this, period * 1000);
+         }
+      }, startDelay);
+   }
+
+   private void updateNow() {
+      stopCycle();
+      handler.post(() -> {
+         try {
+            if (!fetchImage())
+               Toast.makeText(this, "Network is wrong or unavailable", Toast.LENGTH_SHORT).show();
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+            prefs.edit().putLong(UPDATE_TIME_KEY, System.currentTimeMillis()).apply();
+         } finally {
+            startCycle();
+            Log.i(TAG, "job: stop");
+            //stopSelf(startId);
+         }
+      });
+   }
+
+   private boolean fetchImage() {
       FileOutputStream stream = null;
       ConnectivityManager manager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
       NetworkInfo info = manager.getActiveNetworkInfo();
@@ -165,15 +173,19 @@ public class PhotoLoadingService extends Service {
             }
             Bitmap image = loadImage(fetcher.next());
             Log.i(TAG, "job: loaded image");
+
             stream = new FileOutputStream(new File(getFilesDir(), BACKGROUND_PNG));
             image.compress(Bitmap.CompressFormat.PNG, 100, stream);
             Log.i(TAG, "job: saved image");
-            image.recycle();
-            LocalBroadcastManager lbm = LocalBroadcastManager.getInstance(this);
-            Intent intent = new Intent(IMAGE_READY_BROADCAST);
-            lbm.sendBroadcast(intent);
+
+            for (ImageReadyListener listener : listeners)
+               listener.onImageReady(image);
+
+            return true;
          } catch (IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
+            Log.w(TAG, "fetchImage: IOException occurred", e);
+            return false;
          } finally {
             if (stream != null) try {
                stream.close();
@@ -183,6 +195,7 @@ public class PhotoLoadingService extends Service {
          }
       else {
          Log.i(TAG, "fetchImage: network is not ready or not appropriate");
+         return false;
       }
    }
 
@@ -198,7 +211,45 @@ public class PhotoLoadingService extends Service {
    }
 
    @Override
-   public IBinder onBind(Intent intent) {return null;}
+   public IBinder onBind(Intent intent) {
+      Log.i(TAG, "onBind: binder is created");
+      startCycle();
+      serviceBinder = new PhotoServiceBinder();
+      return serviceBinder;
+   }
+
+   @Override public boolean onUnbind(Intent intent) {
+      Log.i(TAG, "onUnbind: called");
+      stopCycle();
+      return super.onUnbind(intent);
+   }
+
+   @FunctionalInterface
+   public interface ImageReadyListener {
+      void onImageReady(@Nullable Bitmap bitmap);
+   }
+
+
+   private List<ImageReadyListener> listeners = new ArrayList<>();
+
+   public final class PhotoServiceBinder extends Binder {
+
+      public void addListener(@NonNull ImageReadyListener listener) {
+         listeners.add(listener);
+      }
+
+      public void removeListener(ImageReadyListener listener) {
+         listeners.remove(listener);
+      }
+
+      public void updateNow() {
+         PhotoLoadingService.this.updateNow();
+      }
+
+      public void loadCurrentImage(@NonNull ImageReadyListener listener) {
+         PhotoLoadingService.this.loadCurrentImage(listener);
+      }
+   }
 
    private class ServiceHandler extends Handler {
       ServiceHandler(Looper looper) {

@@ -17,8 +17,10 @@
    <string name="new_installed_apps">NEW INSTALLED APPS</string>
    <string name="popular_apps">POPULAR APPS</string>
    <string name="launched_msg">%s app launched</string>
-   <string name="menu_delete">Delete</string>
+   <string name="menu_delete">Uninstall</string>
    <string name="menu_info">Info</string>
+   <string name="menu_add_to_faves">Add to favourites</string>
+   <string name="menu_remove_from_faves">Remove from favourites</string>
    <string name="app_info_header">application info:</string>
    <string name="favourites_screen">Favourites screen</string>
    <string name="setting_show_fav_apps_tab">Show favourite apps tab</string>
@@ -28,6 +30,8 @@
    <string name="settings_image_provider">Background image provider</string>
    <string name="settings_image_update_period">Background image update period</string>
    <string name="hint_enter_some_uri">Enter some uri...</string>
+   <string name="setting_clear_search_history">Clear search history</string>
+   <string name="setting_clear_favourite_apps_screen">Clear favourite apps screen</string>
 
    <!-- TODO: Remove or change this placeholder text -->
 </resources>

@@ -36,7 +36,10 @@ public abstract class AppListFragment extends Fragment implements AppListAdapter
 
    @Override public boolean onLongClick(String packageName, int appId, Drawable icon, boolean isFavourite) {
       Activity activity = getActivity();
-      String[] items = {"Info", "Uninstall", isFavourite ? "Remove from favourites" : "Add to favourites"};
+      String[] items = {getString(R.string.menu_info),
+          getString(R.string.menu_delete),
+          isFavourite ? getString(R.string.menu_remove_from_faves) :
+              getString(R.string.menu_add_to_faves)};
       new AlertDialog.Builder(activity)
           .setItems(items, (dialog, which) -> {
              switch (which) {
