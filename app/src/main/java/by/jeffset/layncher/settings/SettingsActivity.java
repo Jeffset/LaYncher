@@ -14,6 +14,7 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageSwitcher;
@@ -109,7 +110,11 @@ public class SettingsActivity extends AppCompatActivity
 
    @Override public void onImageReady(@Nullable Bitmap bitmap) {
       if (bitmap != null)
-         runOnUiThread(() -> background.setImageDrawable(new BitmapDrawable(bitmap)));
+         runOnUiThread(() -> {
+            if (bitmap != null)
+               background.setImageDrawable(new BitmapDrawable(bitmap));
+            else Log.w("LaY-PhotoCallback", "onImageReady: null bitmap");
+         });
    }
 
    public static class FavouriteAppsFragment

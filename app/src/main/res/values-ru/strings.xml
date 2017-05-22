@@ -19,7 +19,7 @@
    <string name="popular_apps">ПОПУЛЯРНЫЕ ПРИЛОЖЕНИЯ</string>
    <string name="launched_msg">Приложение %s запущено</string>
    <string name="menu_delete">Удалить</string>
-   <string name="menu_info">Подробнее</string>
+   <string name="menu_info">Информация</string>
    <string name="app_info_header">информация:</string>
    <string name="favourites_screen">Избранное</string>
    <string name="unsplash_it">Unsplash.it</string>
@@ -36,4 +36,8 @@
    <string name="delay8hours">8 часов</string>
    <string name="delay1day">один раз в сутки</string>
    <string name="hint_enter_some_uri">Введите URI для поиска...</string>
+   <string name="setting_clear_search_history">Очистить историю поиска</string>
+   <string name="setting_clear_favourite_apps_screen">Очистить избранное</string>
+   <string name="menu_add_to_faves">Добавить в избранное</string>
+   <string name="menu_remove_from_faves">Удалить из избранного</string>
 </resources>

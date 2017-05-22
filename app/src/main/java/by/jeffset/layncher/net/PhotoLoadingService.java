@@ -35,8 +35,6 @@ import by.jeffset.layncher.settings.SettingsWrapper;
 public class PhotoLoadingService extends Service {
    private static final String TAG = "LaY-PhotoService";
 
-   public static final String IMAGE_READY_BROADCAST = "by.jeffset.layncher.net.broadcast.IMAGE_READY";
-
    private static final String BACKGROUND_PNG = "background.png";
    private static final String UPDATE_TIME_KEY = "by.layncher.lastImageUpdateTime";
 
@@ -44,7 +42,6 @@ public class PhotoLoadingService extends Service {
    private ServiceHandler handler;
    private PhotoFetcherFactory fetcherFactory;
    private boolean runningCycle = false;
-   private PhotoServiceBinder serviceBinder;
 
 
    /*public static void startUpdateNow(@NonNull Context context) {
@@ -100,15 +97,17 @@ public class PhotoLoadingService extends Service {
 
    private void loadCurrentImage(ImageReadyListener listener) {
       AsyncTask.execute(() -> {
-         File imageFile = new File(getFilesDir(), BACKGROUND_PNG);
-         if (imageFile.exists()) {
-            try {
-               Log.i(TAG, "loadCurrentImage: start");
-               Bitmap bitmap = BitmapFactory.decodeStream(new FileInputStream(imageFile));
-               Log.i(TAG, "loadCurrentImage: end");
-               listener.onImageReady(bitmap);
-            } catch (FileNotFoundException ignored) {
-               listener.onImageReady(null);
+         synchronized (PhotoLoadingService.class) {
+            File imageFile = new File(getFilesDir(), BACKGROUND_PNG);
+            if (imageFile.exists()) {
+               try {
+                  Log.i(TAG, "loadCurrentImage: start");
+                  Bitmap bitmap = BitmapFactory.decodeStream(new FileInputStream(imageFile));
+                  Log.i(TAG, "loadCurrentImage: end");
+                  listener.onImageReady(bitmap);
+               } catch (FileNotFoundException ignored) {
+                  listener.onImageReady(null);
+               }
             }
          }
       });
@@ -171,12 +170,15 @@ public class PhotoLoadingService extends Service {
                fetcher.initFetcher();
                Log.i(TAG, "job: initialized fetcher");
             }
+
             Bitmap image = loadImage(fetcher.next());
             Log.i(TAG, "job: loaded image");
-
-            stream = new FileOutputStream(new File(getFilesDir(), BACKGROUND_PNG));
-            image.compress(Bitmap.CompressFormat.PNG, 100, stream);
-            Log.i(TAG, "job: saved image");
+            synchronized (PhotoLoadingService.class) {
+               Log.i(TAG, "job: saving image...");
+               stream = new FileOutputStream(new File(getFilesDir(), BACKGROUND_PNG));
+               image.compress(Bitmap.CompressFormat.PNG, 100, stream);
+               Log.i(TAG, "job: saved image");
+            }
 
             for (ImageReadyListener listener : listeners)
                listener.onImageReady(image);
@@ -214,8 +216,7 @@ public class PhotoLoadingService extends Service {
    public IBinder onBind(Intent intent) {
       Log.i(TAG, "onBind: binder is created");
       startCycle();
-      serviceBinder = new PhotoServiceBinder();
-      return serviceBinder;
+      return new PhotoServiceBinder();
    }
 
    @Override public boolean onUnbind(Intent intent) {
@@ -228,7 +229,6 @@ public class PhotoLoadingService extends Service {
    public interface ImageReadyListener {
       void onImageReady(@Nullable Bitmap bitmap);
    }
-
 
    private List<ImageReadyListener> listeners = new ArrayList<>();
 
