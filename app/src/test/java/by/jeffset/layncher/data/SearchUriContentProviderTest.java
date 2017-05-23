@@ -82,6 +82,11 @@ public class SearchUriContentProviderTest {
       resolver.delete(SearchContract.LAST_ONE_URI, null, null);
    }
 
+   @Test(expected = UnsupportedOperationException.class)
+   public void testDeleteLastDay() {
+      resolver.delete(SearchContract.LAST_DAY_URI, null, null);
+   }
+
    @Before
    public void setUp() throws Exception {
       resolver = RuntimeEnvironment.application.getContentResolver();
