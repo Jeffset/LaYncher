@@ -84,6 +84,15 @@ public class PhotoFetcherFactoryTest {
       assertEquals(fetcher, factory.obtainFetcher());
    }
 
+   @Test(expected = IllegalStateException.class)
+   public void obtainFetcherFail() throws Exception {
+      SharedPreferences preferences = mock(SharedPreferences.class);
+      doReturn("some illegal value")
+          .when(preferences).getString(eq("fetcher"), any());
+      PhotoFetcherFactory factory = new PhotoFetcherFactory(100, 200, preferences, "fetcher");
+      factory.obtainFetcher();
+   }
+
    @Test
    public void obtainFetcherStub() throws Exception {
       TestSharedPrefs prefs = new TestSharedPrefs();

@@ -1,6 +1,8 @@
 
 apply plugin: 'com.android.application'
 
+apply from: 'jacoco.gradle'
+
 android {
     compileSdkVersion 25
     buildToolsVersion "26.0.0-rc2"
@@ -14,6 +16,9 @@ android {
         vectorDrawables.useSupportLibrary = true
     }
     buildTypes {
+        debug{
+            testCoverageEnabled true
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
