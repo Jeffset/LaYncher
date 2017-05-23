@@ -39,7 +39,7 @@ public class SearchUriContentProvider extends ContentProvider {
             getContext().getContentResolver().notifyChange(SearchContract.ALL_URI, null);
             return count;
          default: // for all others deletion is not supported
-            return -1;
+            throw new UnsupportedOperationException();
       }
    }
 
@@ -51,7 +51,7 @@ public class SearchUriContentProvider extends ContentProvider {
          case ALL_CODE:
             return String.format("vnd.%s/vnd.%s", SearchContract.AUTHORITY, "searchUri");
          default:
-            return null;
+            throw new UnsupportedOperationException();
       }
    }
 
@@ -65,7 +65,7 @@ public class SearchUriContentProvider extends ContentProvider {
             getContext().getContentResolver().notifyChange(SearchContract.ALL_URI, null);
             return insertedUri;
          default:// for all others insertion is not supported
-            return null;
+            throw new UnsupportedOperationException();
       }
    }
 
@@ -103,7 +103,7 @@ public class SearchUriContentProvider extends ContentProvider {
          case ALL_CODE:
             return queryImpl(projection, selection, selectionArgs, sortOrder);
          default:
-            return null;
+            throw new UnsupportedOperationException();
       }
    }
 
@@ -125,7 +125,7 @@ public class SearchUriContentProvider extends ContentProvider {
             getContext().getContentResolver().notifyChange(uri, null);
             return count;
          default:
-            return -1;
+            throw new UnsupportedOperationException();
       }
    }
 }

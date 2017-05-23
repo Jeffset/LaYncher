@@ -1,28 +1,22 @@
 package by.jeffset.layncher.net;
 
-import android.support.test.runner.AndroidJUnit4;
-
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
+import org.xmlpull.v1.XmlPullParserException;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import okhttp3.HttpUrl;
-import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
-import okhttp3.mockwebserver.RecordedRequest;
-
-import static java.net.HttpURLConnection.HTTP_OK;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-@RunWith(AndroidJUnit4.class)
-public class YandexFotkiPhotoFetcherTest {
+@RunWith(RobolectricTestRunner.class)
+@Config(manifest = Config.NONE)
+public class YandexFotkiPhotoFetcherLocalTest {
 
    private static final String text =
        "<feed xmlns=\"http://www.w3.org/2005/Atom\" xmlns:app=\"http://www.w3.org/2007/app\" xmlns:f=\"yandex:fotki\">\n" +
@@ -67,7 +61,6 @@ public class YandexFotkiPhotoFetcherTest {
            "  \n" +
            "\n" +
            "</feed>";
-   private MockWebServer server;
 
    private void assertInfo(YandexFotkiPhotoFetcher fetcher) throws MalformedURLException {
       assertTrue(fetcher.hasNext());
@@ -79,39 +72,10 @@ public class YandexFotkiPhotoFetcherTest {
       assertEquals(entry.images.get("XXL"), new URL("http://img-fotki.yandex.ru/get/6204/35254900.3/0_67769_6a0d6298_XXL"));
    }
 
-   @Before
-   public void setUp() throws IOException {
-      server = new MockWebServer();
-      server.enqueue(new MockResponse().setBody(text));
-      server.start();
-   }
-
-   @After
-   public void tearDown() throws IOException {
-      server.shutdown();
-   }
-
    @Test
-   public void testUsingMockWebServer() throws IOException {
-      final HttpUrl url = server.url("/");
+   public void testXmlParsing() throws IOException, XmlPullParserException {
       YandexFotkiPhotoFetcher fetcher = new YandexFotkiPhotoFetcher();
-      fetcher.url = url.url();
-      fetcher.initFetcher();
+      fetcher.parseImageList(new ByteArrayInputStream(text.getBytes()));
       assertInfo(fetcher);
-   }
-
-   @Test
-   public void demoServer() throws IOException, InterruptedException {
-      MockWebServer server = new MockWebServer();
-      server.enqueue(new MockResponse().setBody("spicy salsa"));
-      server.start();
-
-      URL url = server.url("/tacos").url();
-      HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-      assertEquals(HTTP_OK, connection.getResponseCode());
-
-      RecordedRequest request = server.takeRequest();
-      assertEquals("GET /tacos HTTP/1.1", request.getRequestLine());
-      server.shutdown();
    }
 }

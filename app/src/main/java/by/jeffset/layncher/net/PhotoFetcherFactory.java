@@ -1,35 +1,28 @@
 package by.jeffset.layncher.net;
 
-import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
-import android.util.DisplayMetrics;
-import android.view.Display;
-import android.view.WindowManager;
 
 import java.util.Map;
 import java.util.TreeMap;
 
-import by.jeffset.layncher.settings.SettingsWrapper;
-
 final class PhotoFetcherFactory {
 
    private static final Map<String, PhotoFetcher> fetchers = new TreeMap<>();
-   private final Context context;
+   private final int width;
+   private final int height;
+   private final SharedPreferences prefs;
+   private final String fetcherRes;
 
-   private final SettingsWrapper wrapper;
-   private final DisplayMetrics metrics;
-
-   PhotoFetcherFactory(@NonNull Context context) {
-      this.context = context;
-      wrapper = new SettingsWrapper(this.context);
-      WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-      Display display = wm.getDefaultDisplay();
-      metrics = new DisplayMetrics();
-      display.getMetrics(metrics);
+   PhotoFetcherFactory(int width, int height, @NonNull SharedPreferences prefs, String fetcherRes) {
+      this.width = width;
+      this.height = height;
+      this.prefs = prefs;
+      this.fetcherRes = fetcherRes;
    }
 
    @NonNull PhotoFetcher obtainFetcher() {
-      String fetcherName = wrapper.getPhotoFetcher();
+      String fetcherName = prefs.getString(fetcherRes, "unsplash.it");
       if (fetchers.containsKey(fetcherName))
          return fetchers.get(fetcherName);
 
@@ -37,7 +30,8 @@ final class PhotoFetcherFactory {
 
       switch (fetcherName) {
          case "unsplash.it":
-            fetcher = new UnsplashItPhotoFetcher(metrics.widthPixels, metrics.heightPixels);
+            int max = Math.max(width, height);
+            fetcher = new UnsplashItPhotoFetcher(max, max);
             break;
          case "yandex.fotki":
             fetcher = new YandexFotkiPhotoFetcher();

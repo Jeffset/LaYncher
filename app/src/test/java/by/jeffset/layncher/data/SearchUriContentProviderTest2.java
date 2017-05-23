@@ -2,31 +2,34 @@ package by.jeffset.layncher.data;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.pm.ProviderInfo;
 import android.database.Cursor;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.runner.AndroidJUnit4;
-import android.test.ProviderTestCase2;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.Robolectric;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.RuntimeEnvironment;
+import org.robolectric.Shadows;
+import org.robolectric.shadows.ShadowContentResolver;
 
 import by.jeffset.data.SearchContract;
 
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertNotNull;
 
-@RunWith(AndroidJUnit4.class)
-public class SearchUriContentProviderTest extends ProviderTestCase2<SearchUriContentProvider> {
+
+@RunWith(RobolectricTestRunner.class)
+public class SearchUriContentProviderTest2 {
 
    private ContentResolver resolver;
-
-   public SearchUriContentProviderTest() {
-      super(SearchUriContentProvider.class, "by.jeffset.layncher");
-   }
+   private ShadowContentResolver shadowContentResolver;
 
    @Test
    public void basicTest() {
-      Cursor query = resolver.query(SearchContract.ALL_URI,
+      Cursor query = shadowContentResolver.query(SearchContract.ALL_URI,
           null, null, null, null);
       assertNotNull(query);
       assertTrue(query.getCount() == 0);
@@ -65,6 +68,13 @@ public class SearchUriContentProviderTest extends ProviderTestCase2<SearchUriCon
       query.close();
 
       //================================================================
+      resolver.delete(SearchContract.ALL_URI, null, null);
+      //=========================================
+      query = resolver.query(SearchContract.LAST_ONE_URI,
+          null, null, null, null);
+      assertNotNull(query);
+      assertTrue(query.getCount() == 0);
+      query.close();
    }
 
    @Test(expected = UnsupportedOperationException.class)
@@ -73,17 +83,12 @@ public class SearchUriContentProviderTest extends ProviderTestCase2<SearchUriCon
    }
 
    @Before
-   @Override
    public void setUp() throws Exception {
-      setContext(InstrumentationRegistry.getTargetContext());
-      super.setUp();
-      resolver = getMockContentResolver();
-   }
-
-   @After
-   @Override
-   public void tearDown() throws Exception {
-      super.tearDown();
+      resolver = RuntimeEnvironment.application.getContentResolver();
+      shadowContentResolver = Shadows.shadowOf(resolver);
+      ProviderInfo info = new ProviderInfo();
+      info.authority = SearchContract.AUTHORITY;
+      Robolectric.buildContentProvider(SearchUriContentProvider.class).create(info);
    }
 
 }

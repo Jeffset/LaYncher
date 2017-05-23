@@ -16,7 +16,9 @@ import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import java.io.BufferedInputStream;
@@ -30,6 +32,7 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
+import by.jeffset.layncher.R;
 import by.jeffset.layncher.settings.SettingsWrapper;
 
 public class PhotoLoadingService extends Service {
@@ -50,7 +53,11 @@ public class PhotoLoadingService extends Service {
    @Override public void onCreate() {
       super.onCreate();
 
-      fetcherFactory = new PhotoFetcherFactory(this);
+      WindowManager windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
+      DisplayMetrics metrics = new DisplayMetrics();
+      windowManager.getDefaultDisplay().getMetrics(metrics);
+      fetcherFactory = new PhotoFetcherFactory(metrics.widthPixels, metrics.heightPixels,
+          PreferenceManager.getDefaultSharedPreferences(this), getString(R.string.pref_photo_fetcher));
 
       HandlerThread thread = new HandlerThread("PhotoLoadingService");
       thread.start();

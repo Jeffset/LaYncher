@@ -16,12 +16,12 @@ import java.net.URL;
 final class UnsplashItPhotoFetcher extends PhotoFetcher {
    private final int width;
    private final int height;
-   private int imageId = 10;
+
+   int imageId = 10;
 
    UnsplashItPhotoFetcher(int width, int height) {
-      int m = Math.max(width, height);
-      this.width = m;
-      this.height = m;
+      this.width = width;
+      this.height = height;
    }
 
    @Override void initFetcher() throws IOException {
