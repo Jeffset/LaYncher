@@ -40,4 +40,6 @@
    <string name="setting_clear_favourite_apps_screen">Очистить избранное</string>
    <string name="menu_add_to_faves">Добавить в избранное</string>
    <string name="menu_remove_from_faves">Удалить из избранного</string>
+   <string name="wifi_only_network">Wi-Fi</string>
+   <string name="mobile_and_wifi_network">Мобильная сеть + Wi-Fi</string>
 </resources>

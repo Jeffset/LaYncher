@@ -50,5 +50,12 @@
       android:key="@string/pref_update_photo_delay"
       android:title="@string/settings_image_update_period"
       />
+   <ListPreference
+      android:defaultValue="all"
+      android:entries="@array/network_types"
+      android:entryValues="@array/network_types_values"
+      android:key="@string/pref_update_photo_network"
+      android:title="@string/setting_image_update_network"
+      />
 
 </PreferenceScreen>

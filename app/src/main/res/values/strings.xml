@@ -32,6 +32,6 @@
    <string name="hint_enter_some_uri">Enter some uri...</string>
    <string name="setting_clear_search_history">Clear search history</string>
    <string name="setting_clear_favourite_apps_screen">Clear favourite apps screen</string>
+   <string name="setting_image_update_network" translatable="false">Update image via network type</string>
 
-   <!-- TODO: Remove or change this placeholder text -->
 </resources>

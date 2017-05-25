@@ -9,5 +9,6 @@
    <string name="pref_history_len_key" translatable="false">layncher.history_len</string>
    <string name="pref_photo_fetcher" translatable="false">layncher.photo_fetcher</string>
    <string name="pref_update_photo_delay" translatable="false">layncher.photo_update_delay</string>
+   <string name="pref_update_photo_network" translatable="false">layncher.photo_update_network</string>
    <!--===========================================-->
 </resources>

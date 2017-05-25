@@ -58,4 +58,18 @@
       <item>86400</item>
    </string-array>
 
+
+   <string name="wifi_only_network">Wi-Fi</string>
+   <string name="mobile_and_wifi_network">Wi-Fi and Mobile</string>
+
+   <string-array name="network_types">
+      <item>@string/wifi_only_network</item>
+      <item>@string/mobile_and_wifi_network</item>
+   </string-array>
+
+   <string-array name="network_types_values">
+      <item>wifi</item>
+      <item>all</item>
+   </string-array>
+
 </resources>

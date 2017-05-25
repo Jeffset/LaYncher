@@ -60,6 +60,11 @@ public class SettingsWrapper {
       return Integer.valueOf(prefs.getString(res.getString(R.string.pref_update_photo_delay), String.valueOf(900)));
    }
 
+   public boolean allowMobileData() {
+      final String setting = prefs.getString(res.getString(R.string.pref_update_photo_network), "all");
+      return setting.equals("all");
+   }
+
    public void setHistoryLength(int length) {
       prefs.edit().putString(res.getString(R.string.pref_history_len_key), String.valueOf(length)).apply();
    }
