@@ -57,7 +57,7 @@ public class SettingsWrapper {
    }
 
    public int getImageUpdatePeriod() {
-      return Integer.valueOf(prefs.getString(res.getString(R.string.pref_update_photo_delay), null));
+      return Integer.valueOf(prefs.getString(res.getString(R.string.pref_update_photo_delay), String.valueOf(900)));
    }
 
    public void setHistoryLength(int length) {

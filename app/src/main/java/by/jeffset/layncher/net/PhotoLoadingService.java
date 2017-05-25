@@ -131,7 +131,7 @@ public class PhotoLoadingService extends Service {
       FileOutputStream stream = null;
       ConnectivityManager manager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
       NetworkInfo info = manager.getActiveNetworkInfo();
-      if (info != null && info.getType() != ConnectivityManager.TYPE_MOBILE && info.isConnected())
+      if (info != null &&/* info.getType() != ConnectivityManager.TYPE_MOBILE && */info.isConnected())
          try {
             Log.i(TAG, "job: start");
             PhotoFetcher fetcher = fetcherFactory.obtainFetcher();
